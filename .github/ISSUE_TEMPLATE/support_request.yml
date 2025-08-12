@@ -1,0 +1,153 @@
+name: ❓ Support Request
+description: Get help with using AirXpress or ask questions
+title: "[SUPPORT]: "
+labels: ["support", "question"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help with AirXpress? We're here to assist! Please provide details about what you need help with.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Question/Issue
+      description: What do you need help with?
+      placeholder: Describe your question or issue in detail...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 📂 Category
+      description: What category does your question fall into?
+      options:
+        - Getting Started
+        - Account Setup
+        - Creating Quotes
+        - Booking Shipments
+        - Payment Issues
+        - Tracking Shipments
+        - Admin Functions
+        - API Integration
+        - Billing Questions
+        - Technical Issues
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-role
+    attributes:
+      label: 👤 User Role
+      description: What type of account do you have?
+      options:
+        - New User
+        - Regular Customer
+        - Business Customer
+        - API Developer
+        - Administrator
+        - Support Agent
+        - Operations Team
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: 🔍 What have you tried?
+      description: What steps have you already taken to solve this issue?
+      placeholder: |
+        1. I tried...
+        2. I looked at...
+        3. I searched for...
+
+  - type: textarea
+    id: expected-result
+    attributes:
+      label: ✅ Expected Result
+      description: What were you trying to accomplish?
+      placeholder: What did you expect to happen?
+
+  - type: textarea
+    id: actual-result
+    attributes:
+      label: ❌ Actual Result
+      description: What happened instead?
+      placeholder: What actually happened?
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: If applicable, add screenshots to help explain your question.
+      placeholder: Drag and drop images here or click to upload
+
+  - type: input
+    id: account-info
+    attributes:
+      label: 🔑 Account Information (Optional)
+      description: Your account email or ID (helps us provide better support)
+      placeholder: your.email@example.com
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: ⚡ Urgency
+      description: How urgent is this request?
+      options:
+        - Low - General question, no rush
+        - Medium - Need answer within a few days
+        - High - Blocking current work
+        - Critical - Business-critical issue
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: 💻 Environment
+      description: What browser/device are you using?
+      placeholder: e.g., Chrome on Windows, Safari on iPhone
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 📝 Additional Information
+      description: Any other details that might be helpful?
+      placeholder: Include any error messages, relevant URLs, or other context...
+
+  - type: checkboxes
+    id: documentation
+    attributes:
+      label: 📚 Documentation Check
+      description: Have you checked our documentation?
+      options:
+        - label: I have checked the README.md file
+        - label: I have looked at the API documentation
+        - label: I have searched existing issues
+        - label: I couldn't find an answer in the documentation
+
+  - type: checkboxes
+    id: contact-preference
+    attributes:
+      label: 📞 Contact Preference
+      description: How would you prefer to receive follow-up?
+      options:
+        - label: GitHub issue comments (default)
+        - label: Email follow-up requested
+        - label: No follow-up needed if resolved
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Response Time**: 
+        - Support questions: Within 24-48 hours
+        - Technical issues: Within 1-2 business days
+        - Critical issues: Within 4-8 hours
+        
+        For urgent matters, you can also contact support@airxpress.com directly.

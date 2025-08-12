@@ -1,0 +1,173 @@
+name: 🐛 Bug Report
+description: File a bug report to help us improve AirXpress
+title: "[BUG]: "
+labels: ["bug", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible to help us investigate and fix the issue.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 🐛 Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: ❌ Actual Behavior
+      description: A clear and concise description of what actually happened.
+      placeholder: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: Drag and drop images here or click to upload
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 🧩 Component
+      description: Which part of the application is affected?
+      options:
+        - Quote System
+        - Booking Management
+        - Payment Processing
+        - Admin Dashboard
+        - User Authentication
+        - Pricing Engine
+        - Document Management
+        - Notifications
+        - API Endpoints
+        - Database
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: ⚡ Severity
+      description: How severe is this bug?
+      options:
+        - Critical - System unusable
+        - High - Major functionality broken
+        - Medium - Some functionality affected
+        - Low - Minor issue or cosmetic
+    validations:
+      required: true
+
+  - type: input
+    id: environment-os
+    attributes:
+      label: 💻 Operating System
+      description: What operating system are you using?
+      placeholder: e.g., Windows 11, macOS 14.0, Ubuntu 22.04
+    validations:
+      required: true
+
+  - type: input
+    id: environment-browser
+    attributes:
+      label: 🌐 Browser
+      description: What browser are you using?
+      placeholder: e.g., Chrome 120.0, Firefox 121.0, Safari 17.0
+    validations:
+      required: true
+
+  - type: input
+    id: environment-version
+    attributes:
+      label: 📱 Device/Screen Size
+      description: What device or screen size were you using?
+      placeholder: e.g., iPhone 15, 1920x1080 desktop, iPad Pro
+
+  - type: dropdown
+    id: user-role
+    attributes:
+      label: 👤 User Role
+      description: What type of user account were you using?
+      options:
+        - Guest User
+        - Registered User
+        - Support User
+        - Operations User
+        - Administrator
+        - Not Applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: 🔴 Console Errors
+      description: Are there any errors in the browser console? (Press F12 to open)
+      placeholder: Paste any console errors here...
+
+  - type: textarea
+    id: network-errors
+    attributes:
+      label: 🌐 Network Errors
+      description: Are there any failed network requests? (Check Network tab in browser dev tools)
+      placeholder: Paste any network errors here...
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Additional Context
+      description: Add any other context about the problem here.
+      placeholder: Any additional information that might help...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have provided all requested information above
+          required: true
+        - label: I have tested this on the latest version
+          required: true
+        - label: This bug is reproducible
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Privacy Notice**: Please do not include sensitive information such as passwords, API keys, or personal data in this bug report. If you need to share sensitive information, please contact support@airxpress.com directly.

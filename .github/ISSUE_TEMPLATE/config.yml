@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🚨 Security Vulnerability
+    url: mailto:security@airxpress.com
+    about: Please report security vulnerabilities directly to our security team via email (do not create public issues)
+  
+  - name: 💬 General Support
+    url: mailto:support@airxpress.com
+    about: For general support questions, billing inquiries, or urgent matters
+  
+  - name: 📚 Documentation
+    url: https://github.com/Qcsinc23/Airxpressv1/blob/main/README.md
+    about: Check our comprehensive documentation for setup instructions and API reference
+  
+  - name: 🎯 Roadmap & Planning
+    url: https://github.com/Qcsinc23/Airxpressv1/projects
+    about: See our development roadmap and upcoming features

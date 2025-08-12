@@ -1,0 +1,208 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for AirXpress
+title: "[FEATURE]: "
+labels: ["enhancement", "feature-request", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature! Your ideas help make AirXpress better for everyone.
+
+  - type: textarea
+    id: feature-summary
+    attributes:
+      label: ✨ Feature Summary
+      description: A clear and concise description of the feature you'd like to see.
+      placeholder: Briefly describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: 🎯 Problem Statement
+      description: What problem does this feature solve? What pain point does it address?
+      placeholder: Describe the problem this feature would solve...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 💡 Proposed Solution
+      description: Describe your proposed solution in detail.
+      placeholder: How do you think this feature should work?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: 🔄 Use Cases
+      description: Provide specific examples of how this feature would be used.
+      placeholder: |
+        1. As a [user type], I want to [action] so that [benefit]
+        2. When [scenario], I need [functionality] because [reason]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-type
+    attributes:
+      label: 👤 Primary User Type
+      description: Which type of user would benefit most from this feature?
+      options:
+        - End Customers
+        - Operations Team
+        - Support Team
+        - Administrators
+        - All Users
+        - Developers/API Users
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 🧩 Component Area
+      description: Which part of the application would this feature affect?
+      options:
+        - Quote System
+        - Booking Management
+        - Payment Processing
+        - Admin Dashboard
+        - User Authentication
+        - Pricing Engine
+        - Document Management
+        - Notifications
+        - API Endpoints
+        - Mobile Experience
+        - Reporting/Analytics
+        - Integration/Webhooks
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: ⚡ Priority
+      description: How important is this feature to you?
+      options:
+        - Critical - Blocking current workflows
+        - High - Would significantly improve experience
+        - Medium - Nice to have improvement
+        - Low - Minor enhancement
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative-solutions
+    attributes:
+      label: 🔄 Alternative Solutions
+      description: Have you considered any alternative approaches or workarounds?
+      placeholder: Describe any alternative solutions you've considered...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: 🎨 Mockups/Wireframes
+      description: If applicable, add mockups, wireframes, or visual examples.
+      placeholder: Drag and drop images here or provide links to designs...
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: ⚙️ Technical Considerations
+      description: Any technical requirements or constraints to consider?
+      placeholder: API changes, database modifications, third-party integrations, etc...
+
+  - type: checkboxes
+    id: feature-type
+    attributes:
+      label: 🏷️ Feature Type
+      description: What type of feature is this? (Select all that apply)
+      options:
+        - label: User Interface Enhancement
+        - label: New API Endpoint
+        - label: Performance Improvement
+        - label: Security Enhancement
+        - label: Integration with Third-party Service
+        - label: Mobile/Responsive Improvement
+        - label: Admin/Operations Tool
+        - label: Reporting/Analytics Feature
+        - label: Automation/Workflow Improvement
+
+  - type: dropdown
+    id: business-impact
+    attributes:
+      label: 📈 Business Impact
+      description: What kind of business impact would this feature have?
+      options:
+        - Revenue Generation - Directly increases revenue
+        - Cost Reduction - Reduces operational costs
+        - User Experience - Improves customer satisfaction
+        - Efficiency - Streamlines workflows
+        - Compliance - Meets regulatory requirements
+        - Competitive Advantage - Differentiates from competitors
+        - Risk Mitigation - Reduces business risks
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-metrics
+    attributes:
+      label: 📊 Success Metrics
+      description: How would you measure the success of this feature?
+      placeholder: |
+        - Metric 1: [description]
+        - Metric 2: [description]
+        - Target: [specific goal]
+
+  - type: input
+    id: timeline
+    attributes:
+      label: ⏰ Desired Timeline
+      description: When would you ideally like to see this feature implemented?
+      placeholder: e.g., Next release, Q2 2024, No specific deadline
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Additional Context
+      description: Any other information that would be helpful?
+      placeholder: Links to similar features, industry standards, user feedback, etc...
+
+  - type: checkboxes
+    id: implementation-offer
+    attributes:
+      label: 🤝 Implementation
+      description: Implementation considerations
+      options:
+        - label: I would be willing to help implement this feature
+        - label: I can provide additional requirements/feedback during development
+        - label: I can help with testing/validation
+        - label: I have technical expertise in the relevant area
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have provided a clear problem statement
+          required: true
+        - label: I have described the proposed solution in detail
+          required: true
+        - label: I have considered the business impact
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Next Steps**: After submitting this feature request, the team will review it and may reach out for additional clarification. Feature requests are prioritized based on business impact, user demand, and technical feasibility.
