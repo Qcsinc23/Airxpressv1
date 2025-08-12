@@ -3,6 +3,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
+import Header from '../components/ui/Header';
 import Breadcrumb, { DashboardBreadcrumbs } from '../components/ui/Breadcrumb';
 
 interface BookingSummary {
@@ -87,216 +88,257 @@ export default function UserDashboard() {
 
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading your dashboard...</p>
+          </div>
+        </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>Error loading dashboard: {error}</p>
-            <button 
-              onClick={fetchDashboardData}
-              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Try Again
-            </button>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-red-50/80 backdrop-blur-lg border border-red-200 text-red-700 px-6 py-4 rounded-2xl shadow-lg">
+              <div className="flex items-center">
+                <svg className="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 className="font-semibold">Error loading dashboard</h3>
+                  <p className="text-sm">{error}</p>
+                </div>
+              </div>
+              <button 
+                onClick={fetchDashboardData}
+                className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 hover:scale-105 transform shadow-lg"
+              >
+                Try Again
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb 
-          items={DashboardBreadcrumbs.main} 
-          className="mb-6"
-        />
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb 
+            items={DashboardBreadcrumbs.main} 
+            className="mb-8"
+          />
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user?.firstName || 'User'}!</p>
-        </div>
-
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          {/* Welcome Header */}
+          <div className="mb-10">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">Welcome back, {user?.firstName || 'User'}! ✈️</h1>
+                  <p className="text-blue-100 text-lg">Manage your shipments and track your packages</p>
+                </div>
+                <div className="hidden md:block">
+                  <svg className="w-20 h-20 text-blue-200 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.totalBookings}</h3>
-                  <p className="text-sm text-gray-500">Total Shipments</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.activeBookings}</h3>
-                  <p className="text-sm text-gray-500">Active Shipments</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">${stats.totalSpent.toFixed(2)}</h3>
-                  <p className="text-sm text-gray-500">Total Spent</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.avgDeliveryTime} days</h3>
-                  <p className="text-sm text-gray-500">Avg Delivery Time</p>
                 </div>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <a 
-                href="/quote" 
-                className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
-              >
-                <div className="p-2 bg-blue-100 rounded-lg mr-4">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+          {/* Stats Cards */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:scale-105 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-2xl font-bold text-gray-900">{stats.totalBookings}</h3>
+                    <p className="text-sm text-gray-600 font-medium">Total Shipments</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">New Shipment</h3>
-                  <p className="text-sm text-gray-500">Get a quote and book</p>
-                </div>
-              </a>
+              </div>
 
-              <a 
-                href="/tracking" 
-                className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors"
-              >
-                <div className="p-2 bg-green-100 rounded-lg mr-4">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+              <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:scale-105 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-2xl font-bold text-gray-900">{stats.activeBookings}</h3>
+                    <p className="text-sm text-gray-600 font-medium">Active Shipments</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Track Shipment</h3>
-                  <p className="text-sm text-gray-500">Search by tracking number</p>
-                </div>
-              </a>
+              </div>
 
-              <a 
-                href="/support" 
-                className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
-              >
-                <div className="p-2 bg-purple-100 rounded-lg mr-4">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:scale-105 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-2xl font-bold text-gray-900">${stats.totalSpent.toFixed(2)}</h3>
+                    <p className="text-sm text-gray-600 font-medium">Total Spent</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Get Support</h3>
-                  <p className="text-sm text-gray-500">Contact our team</p>
+              </div>
+
+              <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 hover:scale-105 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-2xl font-bold text-gray-900">{stats.avgDeliveryTime} days</h3>
+                    <p className="text-sm text-gray-600 font-medium">Avg Delivery Time</p>
+                  </div>
                 </div>
-              </a>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Actions */}
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 mb-10">
+            <div className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a 
+                  href="/quote" 
+                  className="group flex items-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl hover:from-blue-100 hover:to-indigo-200 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-blue-200"
+                >
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">New Shipment</h3>
+                    <p className="text-sm text-gray-600">Get a quote and book</p>
+                  </div>
+                </a>
+
+                <a 
+                  href="/tracking" 
+                  className="group flex items-center p-6 bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl hover:from-green-100 hover:to-emerald-200 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-green-200"
+                >
+                  <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="font-bold text-gray-900 group-hover:text-green-700 transition-colors">Track Shipment</h3>
+                    <p className="text-sm text-gray-600">Search by tracking number</p>
+                  </div>
+                </a>
+
+                <a 
+                  href="/support" 
+                  className="group flex items-center p-6 bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl hover:from-purple-100 hover:to-violet-200 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-purple-200"
+                >
+                  <div className="p-3 bg-gradient-to-r from-purple-500 to-violet-500 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors">Get Support</h3>
+                    <p className="text-sm text-gray-600">Contact our team</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Recent Bookings */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Shipments</h2>
-            
-            {bookings.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <svg className="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-                <p>No shipments yet</p>
-                <a href="/quote" className="text-blue-600 hover:text-blue-800 font-medium">Create your first shipment</a>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Tracking #</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Status</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Carrier</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Route</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Cost</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Date</th>
-                      <th className="text-left py-3 px-4 font-semibold text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookings.slice(0, 10).map((booking) => (
-                      <tr key={booking.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-4 text-sm">{booking.trackingNumber}</td>
-                        <td className="py-3 px-4">
-                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
-                            {booking.status.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-sm">{booking.carrier}</td>
-                        <td className="py-3 px-4 text-sm">{booking.route}</td>
-                        <td className="py-3 px-4 text-sm">${booking.totalPrice.toFixed(2)}</td>
-                        <td className="py-3 px-4 text-sm">{new Date(booking.createdAt).toLocaleDateString()}</td>
-                        <td className="py-3 px-4 text-sm">
-                          <a 
-                            href={`/tracking/${booking.trackingNumber}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            Track
-                          </a>
-                        </td>
+          {/* Recent Bookings */}
+          <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20">
+            <div className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Shipments</h2>
+              
+              {bookings.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-lg mb-4">No shipments yet</p>
+                  <a 
+                    href="/quote" 
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 transform shadow-lg hover:shadow-xl"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create your first shipment
+                  </a>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Tracking #</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Status</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Carrier</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Route</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Cost</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Date</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-900">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {bookings.slice(0, 10).map((booking) => (
+                        <tr key={booking.id} className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors duration-200">
+                          <td className="py-4 px-4 text-sm font-medium text-gray-900">{booking.trackingNumber}</td>
+                          <td className="py-4 px-4">
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(booking.status)}`}>
+                              {booking.status.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4 text-sm text-gray-700">{booking.carrier}</td>
+                          <td className="py-4 px-4 text-sm text-gray-700">{booking.route}</td>
+                          <td className="py-4 px-4 text-sm font-semibold text-gray-900">${booking.totalPrice.toFixed(2)}</td>
+                          <td className="py-4 px-4 text-sm text-gray-700">{new Date(booking.createdAt).toLocaleDateString()}</td>
+                          <td className="py-4 px-4">
+                            <a 
+                              href={`/tracking/${booking.trackingNumber}`}
+                              className="inline-flex items-center px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors duration-200"
+                            >
+                              Track
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

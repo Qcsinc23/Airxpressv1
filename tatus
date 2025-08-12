@@ -1,0 +1,26 @@
+[33mcommit 82263af812893b5ad738e62e8c7c5f7fc90d76bf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Qcsinc23 <sales@Quietcraftsolutions.com>
+Date:   Tue Aug 12 18:01:58 2025 -0400
+
+    feat: add professional authentication system with modern UX
+    
+    - Created Header component with Clerk authentication integration
+    - Added Sign In and Create Account buttons with modal integration
+    - Implemented UserButton with custom styling for signed-in users
+    - Added welcome message and smooth sign-out functionality
+    - Enhanced home page with glassmorphism design theme
+    - Updated hero section with gradient text and modern animations
+    - Modernized features section with glassmorphism cards and hover effects
+    - Enhanced destinations section with country flags and visual indicators
+    - Updated CTA section with gradient backgrounds and modern styling
+    - Redesigned footer with social media links and improved layout
+    - Added mobile-responsive navigation with authentication options
+    - Maintained consistent theme throughout all components
+    - Fixed authentication issues: users can now sign in/out properly
+    
+    🤖 Generated with [Claude Code](https://claude.ai/code)
+    
+    Co-Authored-By: Claude <noreply@anthropic.com>
+
+app/components/ui/Header.tsx
+app/page.tsx

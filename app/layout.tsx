@@ -47,20 +47,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Providers>
-      <html lang="en" className="h-full">
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href="/favicon.ico" />
-        </head>
-        <body className={`${inter.className} min-h-full bg-gray-50`}>
+    <html lang="en" className="h-full">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body className={`${inter.className} min-h-full bg-gray-50`}>
+        <Providers>
           <ErrorBoundary>
             <div id="root">
               {children}
             </div>
           </ErrorBoundary>
-        </body>
-      </html>
-    </Providers>
+        </Providers>
+      </body>
+    </html>
   );
 }
