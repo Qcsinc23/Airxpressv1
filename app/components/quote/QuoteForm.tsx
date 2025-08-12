@@ -98,15 +98,19 @@ export default function QuoteForm({ onSubmit, error }: QuoteFormProps) {
       return;
     }
     
+    // Conversion constants
+    const LB_TO_KG = 0.45359237;
+    const IN_TO_CM = 2.54;
+    
     onSubmit({
       ...formData,
       pieces: pieces.map(piece => ({
         type: piece.type as 'barrel' | 'box',
-        weight: Number(piece.weight),
+        weight: Number(piece.weight) * LB_TO_KG, // Convert lbs to kg
         dimensions: piece.length && piece.width && piece.height ? {
-          length: Number(piece.length),
-          width: Number(piece.width),
-          height: Number(piece.height)
+          length: Number(piece.length) * IN_TO_CM, // Convert inches to cm
+          width: Number(piece.width) * IN_TO_CM,
+          height: Number(piece.height) * IN_TO_CM
         } : undefined
       }))
     });

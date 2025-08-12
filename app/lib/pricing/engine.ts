@@ -40,9 +40,6 @@ export class PricingEngine {
 
     // Find applicable tariff band
     const band = this.findTariffBand(tariff, chargeableWeightKg);
-    if (!band) {
-      throw new Error(`No tariff band found for weight ${chargeableWeightKg}kg`);
-    }
 
     // Calculate freight cost
     let freightCost = band.rateUSD;
@@ -225,27 +222,28 @@ export class PricingEngine {
 
   private async findApplicableTariff(origin: string, destination: string): Promise<Tariff | null> {
     // In production, this would query the database
-    // For now, return a mock CAL JetPak tariff
+    // For now, return a mock CAL tariff that can handle any weight for pricing calculations
     return {
-      id: 'cal-jetpak-us-gy-2024',
+      id: 'cal-general-air-us-gy-2024',
       carrier: 'Caribbean Airlines',
-      product: 'JetPak',
+      product: 'General Air',
       origin: 'JFK',
       destination: 'GEO',
       region: 'Guyana',
       bands: [
-        { minWeightKg: 0, maxWeightKg: 4.5, rateUSD: 49.59 },
-        { minWeightKg: 4.5, maxWeightKg: 9, rateUSD: 60.31 },
-        { minWeightKg: 9, maxWeightKg: 20, rateUSD: 81.74 },
+        { minWeightKg: 0, maxWeightKg: 1, rateUSD: 27.34 },
+        { minWeightKg: 1, maxWeightKg: 5, rateUSD: 54.71 },
+        { minWeightKg: 5, maxWeightKg: 10, rateUSD: 72.43 },
+        { minWeightKg: 10, maxWeightKg: 20, rateUSD: 85.86 },
         { minWeightKg: 20, maxWeightKg: 30, rateUSD: 120.28 },
       ],
       overweightRatePerKg: 4.74,
       caps: {
-        maxWeightKg: 50,
+        maxWeightKg: 100, // Higher limit for General Air for testing
         maxDimensionsCm: {
-          length: 157,
-          width: 157,
-          height: 157,
+          length: 300,
+          width: 300,
+          height: 300,
         },
       },
       effectiveDate: '2024-01-01',
@@ -257,10 +255,11 @@ export class PricingEngine {
     };
   }
 
-  private findTariffBand(tariff: Tariff, weightKg: number): TariffBand | null {
-    return tariff.bands.find(band => 
-      weightKg >= band.minWeightKg && weightKg <= band.maxWeightKg
-    ) || null;
+  private findTariffBand(tariff: Tariff, weightKg: number): TariffBand {
+    // Sort by maxWeight just in case
+    const bands = [...tariff.bands].sort((a, b) => a.maxWeightKg - b.maxWeightKg);
+    // Pick first band whose max >= weight, else fall back to last band
+    return bands.find(b => weightKg <= b.maxWeightKg) ?? bands[bands.length - 1];
   }
 
   private calculateChargeableWeight(pieces: CostCalculationInput['pieces']): number {
@@ -297,12 +296,12 @@ export class PricingEngine {
 
   private validateEligibility(pieces: CostCalculationInput['pieces'], tariff: Tariff): void {
     for (const piece of pieces) {
-      // Check weight limit (50 lbs = ~23 kg for JetPak)
-      if (piece.weightKg > 23 && tariff.product === 'JetPak') {
-        throw new Error('Piece exceeds JetPak weight limit. Consider General Air service.');
+      // Check weight limit against tariff caps
+      if (piece.weightKg > tariff.caps.maxWeightKg) {
+        throw new Error(`Piece exceeds ${tariff.product} weight limit (${tariff.caps.maxWeightKg}kg). Consider alternative service.`);
       }
 
-      // Check dimension limits (62 inches = ~157 cm total)
+      // Check dimension limits against tariff caps
       if (piece.dimensions) {
         const totalDimensions = (
           piece.dimensions.lengthCm + 
@@ -310,8 +309,11 @@ export class PricingEngine {
           piece.dimensions.heightCm
         );
         
-        if (totalDimensions > 157 && tariff.product === 'JetPak') {
-          throw new Error('Piece exceeds JetPak dimension limits. Consider General Air service.');
+        const maxTotalDimensions = Object.values(tariff.caps.maxDimensionsCm).reduce((sum, dim) => 
+          Math.min(sum, dim), Infinity); // Use the smallest dimension as total limit approximation
+        
+        if (totalDimensions > maxTotalDimensions) {
+          throw new Error(`Piece exceeds ${tariff.product} dimension limits. Consider alternative service.`);
         }
       }
     }

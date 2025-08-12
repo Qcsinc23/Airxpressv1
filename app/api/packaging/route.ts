@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
             code: 'PLB-45',
             name: 'Plastic Barrel - 45L',
             description: 'Heavy duty plastic barrel for general cargo',
-            sellPriceUSD: 23, // $12.50 * 1.80 = $22.50 → $23
+            sellPriceUSD: Math.ceil(12.50 * 1.80), // Cost $12.50 * markup 1.80 = $22.50 → $23
             category: 'barrel',
             specifications: {
               maxWeightKg: 30,
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
             code: 'FIB-60',
             name: 'Fiber Barrel - 60L',
             description: 'Eco-friendly fiber barrel for food items',
-            sellPriceUSD: 29, // $15.75 * 1.80 = $28.35 → $29
+            sellPriceUSD: Math.ceil(15.75 * 1.80), // Cost $15.75 * markup 1.80 = $28.35 → $29
             category: 'barrel',
             specifications: {
               maxWeightKg: 35,
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
             code: 'ECON-S',
             name: 'E-Container Small',
             description: 'Reusable container for multiple shipments',
-            sellPriceUSD: 45, // $25.00 * 1.80 = $45
+            sellPriceUSD: Math.ceil(25.00 * 1.80), // Cost $25.00 * markup 1.80 = $45.00 → $45
             category: 'container',
             specifications: {
               maxWeightKg: 40,
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
             code: 'MINI-ECON',
             name: 'Mini E-Container',
             description: 'Compact container for small items',
-            sellPriceUSD: 33, // $18.00 * 1.80 = $32.40 → $33
+            sellPriceUSD: Math.ceil(18.00 * 1.80), // Cost $18.00 * markup 1.80 = $32.40 → $33
             category: 'container',
             specifications: {
               maxWeightKg: 20,
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
             code: 'FRAG-PRO',
             name: 'Fragile Item Protection',
             description: 'Extra padding and protection for delicate items',
-            sellPriceUSD: 16, // $8.50 * 1.80 = $15.30 → $16
+            sellPriceUSD: Math.ceil(8.50 * 1.80), // Cost $8.50 * markup 1.80 = $15.30 → $16
             category: 'protection',
             specifications: {
               maxWeightKg: 50,
