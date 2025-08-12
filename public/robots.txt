@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /quote
+Allow: /tracking
+Allow: /
+
+# Block admin and internal pages
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://airxpress.com/sitemap.xml
