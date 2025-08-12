@@ -1,0 +1,69 @@
+---
+title: Express Air Cargo to Guyana from New Jersey
+description: Fast, reliable air freight shipping from NJ to Guyana. Same-day pickup and next-flight-out service available.
+---
+{
+  "originAirport": "JFK",
+  "destAirport": "GEO",
+  "serviceLevel": "EXPRESS",
+  "headline": "Express Air Cargo to Guyana from New Jersey",
+  "intro": "Send packages, barrels, and personal effects from New Jersey to Guyana with our fast and reliable air freight service. We specialize in the unique requirements for shipping to Guyana including C73 customs documentation for personal effects.",
+  "steps": [
+    {
+      "title": "Get a Quote",
+      "description": "Enter your shipment details online to get instant pricing. We provide transparent rates with no hidden fees."
+    },
+    {
+      "title": "Book & Pay",
+      "description": "Confirm your shipment and pay securely online. Receive immediate booking confirmation with pickup details."
+    },
+    {
+      "title": "Same-Day Pickup",
+      "description": "Our 24/7 dispatch team schedules pickup from your NJ location. Book by 2:00 PM ET for same-day JFK tender."
+    },
+    {
+      "title": "Track Your Shipment",
+      "description": "Monitor your shipment status in real-time from pickup to delivery in Guyana."
+    }
+  ],
+  "faq": [
+    {
+      "question": "Do you ship barrels to Guyana?",
+      "answer": "Yes, we specialize in barrel shipping to Guyana. Most non-commercial barrels use Guyana's Form C73 (currently up to US$500). We'll guide you through the documentation process and customs requirements."
+    },
+    {
+      "question": "What are the cutoff times for shipping to Guyana?",
+      "answer": "Book by 2:00 PM ET for same-day tender to JFK. Cutoff times may vary based on flight availability and security screening requirements."
+    },
+    {
+      "question": "What documents are required for shipping to Guyana?",
+      "answer": "All shipments require a Commercial Invoice and Packing List. For personal effects/barrels, we'll help you complete Form C73. Certain items may require additional documentation per Guyana customs requirements."
+    }
+  ],
+  "landmarks": [
+    "Newark Liberty International Airport (EWR)",
+    "John F. Kennedy International Airport (JFK)",
+    "Jersey City",
+    "Paterson",
+    "Elizabeth",
+    "Bayonne"
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Air Cargo Shipping",
+    "provider": {
+      "@type": "Organization",
+      "name": "AirXpress",
+      "areaServed": "New Jersey"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Guyana"
+    },
+    "offers": {
+      "@type": "Offer",
+      "category": "Express Air Freight"
+    }
+  }
+}

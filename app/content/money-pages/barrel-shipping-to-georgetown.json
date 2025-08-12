@@ -1,0 +1,77 @@
+---
+title: Barrel Shipping to Georgetown Guyana from NJ
+description: Specialized barrel shipping service from New Jersey to Georgetown, Guyana with C73 customs documentation.
+---
+{
+  "originAirport": "JFK",
+  "destAirport": "GEO",
+  "serviceLevel": "BARRELS",
+  "headline": "Barrel Shipping to Georgetown Guyana from NJ",
+  "intro": "Our specialized barrel shipping service helps you send personal effects and household items to family in Georgetown, Guyana. We understand the unique requirements for C73 documentation and customs clearance.",
+  "steps": [
+    {
+      "title": "Barrel Preparation",
+      "description": "Pack your barrel according to our guidelines. We provide detailed instructions for prohibited items and proper packing techniques."
+    },
+    {
+      "title": "Customs Documentation",
+      "description": "Complete C73 customs form with our assistance. We'll help you accurately declare contents and value within Guyana's personal effects allowance."
+    },
+    {
+      "title": "Pickup & Weighing",
+      "description": "Our team picks up your barrel and provides accurate weight measurement for final pricing. Book by 2:00 PM ET for same-day processing."
+    },
+    {
+      "title": "Delivery to Georgetown",
+      "description": "Your barrel is delivered to our Georgetown partner for customs clearance and final delivery to your recipient."
+    }
+  ],
+  "faq": [
+    {
+      "question": "What is the maximum value for C73 clearance?",
+      "answer": "Guyana's GRA currently allows personal effects up to US$500 under Form C73. Higher value shipments may require full customs entry (Form C72). We'll help you determine the correct form based on your barrel contents."
+    },
+    {
+      "question": "What items are prohibited in barrels to Guyana?",
+      "answer": "Prohibited items include weapons, ammunition, illicit drugs, counterfeit currency, and unsafe food products. We provide a complete checklist of restricted items before you pack."
+    },
+    {
+      "question": "How much does barrel shipping cost?",
+      "answer": "Pricing is based on barrel size (½ barrel, full barrel, XL) and weight. Standard rates start at $120 for a full barrel up to 100 lbs. Get an instant quote online or call our dispatch team."
+    }
+  ],
+  "landmarks": [
+    "Newark",
+    "Jersey City",
+    "Paterson",
+    "Elizabeth",
+    "Linden",
+    "Bayonne"
+  ],
+  "prohibitedItems": [
+    "Weapons and ammunition",
+    "Illicit drugs and controlled substances",
+    "Counterfeit currency",
+    "Unsafe or expired food products",
+    "Perishable items without proper packaging",
+    "Lithium batteries (installed in devices)"
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Barrel Shipping to Guyana",
+    "provider": {
+      "@type": "Organization",
+      "name": "AirXpress",
+      "areaServed": "New Jersey"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Georgetown, Guyana"
+    },
+    "offers": {
+      "@type": "Offer",
+      "category": "Barrel Shipping"
+    }
+  }
+}

@@ -1,0 +1,136 @@
+---
+title: Prohibited Items for Shipping to Guyana
+description: Complete list of prohibited and restricted items for shipping to Guyana per GRA customs regulations.
+---
+{
+  "title": "Prohibited Items for Shipping to Guyana",
+  "intro": "Guyana's Georgetown Revenue Authority (GRA) maintains strict regulations on items that cannot be imported. Before packing your shipment, review this list to ensure compliance with Guyana customs laws.",
+  "prohibited": [
+    {
+      "category": "Weapons and Ammunition",
+      "items": [
+        "Firearms of any kind",
+        "Ammunition and cartridges",
+        "Knives with blades exceeding 3 inches",
+        "Brass knuckles",
+        "Swords, daggers, and similar weapons"
+      ],
+      "note": "Requires special permit from Guyana Police Force"
+    },
+    {
+      "category": "Narcotics and Controlled Substances",
+      "items": [
+        "Marijuana and cannabis products",
+        "Cocaine and heroin",
+        "Prescription medications without proper documentation",
+        "Anabolic steroids without prescription",
+        "Controlled substances under Guyana's Misuse of Drugs Act"
+      ],
+      "note": "Violation carries severe criminal penalties"
+    },
+    {
+      "category": "Counterfeit Goods",
+      "items": [
+        "Fake currency",
+        "Counterfeit branded products",
+        "Pirated media (DVDs, software, etc.)",
+        "Unauthorized replicas of patented items"
+      ],
+      "note": "Subject to seizure and fines"
+    },
+    {
+      "category": "Unsafe Food Products",
+      "items": [
+        "Meat and dairy products without health certificates",
+        "Expired or contaminated food items",
+        "Items infested with pests",
+        "Home-canned goods without proper labeling"
+      ],
+      "note": "Health certificate required from Guyana Ministry of Health"
+    },
+    {
+      "category": "Plant and Animal Products",
+      "items": [
+        "Live animals without permits",
+        "Plant seeds and bulbs",
+        "Soil and plant material",
+        "Items made from endangered species"
+      ],
+      "note": "Requires permits from Guyana EPA and/or Ministry of Agriculture"
+    }
+  ],
+  "restricted": [
+    {
+      "category": "Electronics and Communications Equipment",
+      "items": [
+        "Radio transmitters",
+        "Satellite phones",
+        "Two-way radios",
+        "Jamming devices"
+      ],
+      "requirement": "Guyana Frequency Management Division permit"
+    },
+    {
+      "category": "Chemicals and Laboratory Equipment",
+      "items": [
+        "Industrial chemicals",
+        "Laboratory reagents",
+        "Scientific apparatus",
+        "Explosives and fireworks"
+      ],
+      "requirement": "Ministry of Natural Resources permit"
+    },
+    {
+      "category": "Medications",
+      "items": [
+        "Controlled prescription drugs",
+        "Large quantities of over-the-counter medications",
+        "Medications without prescriptions"
+      ],
+      "requirement": "Personal quantity with prescription acceptable"
+    },
+    {
+      "category": "Alcoholic Beverages",
+      "items": [
+        "Large quantities for personal importation"
+      ],
+      "requirement": "Within duty-free allowances or declared for duty"
+    }
+  ],
+  "restrictedValueItems": [
+    "Cell phones (more than 2 personal units)",
+    "Tablets and laptops (more than 2 personal units)",
+    "Jewelry exceeding US$500 value",
+    "Electronic devices exceeding personal use quantities"
+  ],
+  "importantNotes": [
+    "Customs officers have discretion to require C72 full entry instead of C73 simplified clearance based on contents",
+    "All restrictions are subject to change - check current GRA guidelines",
+    "Undeclared prohibited items may result in shipment seizure and fines",
+    "We are not liable for shipments rejected by Guyana customs due to prohibited items"
+  ],
+  "resources": [
+    {
+      "title": "Guyana Revenue Authority Official Website",
+      "url": "https://www.gra.gov.gy"
+    },
+    {
+      "title": "Guyana Customs Import Regulations",
+      "url": "https://www.gra.gov.gy/customs-procedures"
+    }
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Prohibited Items for Shipping to Guyana",
+    "description": "Complete list of prohibited and restricted items for shipping to Guyana per GRA customs regulations.",
+    "author": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+---
+title: C73 vs C72 Customs Forms for Guyana Shipments
+description: Understanding the difference between C73 and C72 customs forms for shipping personal effects to Guyana.
+---
+{
+  "title": "C73 vs C72 Customs Forms for Guyana Shipments",
+  "intro": "When shipping personal effects to Guyana, understanding the appropriate customs form is crucial for smooth clearance. Guyana uses two primary forms for personal effects: Form C73 for simplified clearance and Form C72 for full customs entry.",
+  "c73": {
+    "title": "Form C73 - Personal Effects Declaration",
+    "description": "A simplified customs declaration for bona fide personal effects of returning residents or visiting non-residents.",
+    "valueLimit": "Up to US$500 (current GRA guideline)",
+    "eligibility": [
+      "Used personal effects for personal use",
+      "Household items",
+      "Gifts for friends/relatives",
+      "Barrels and boxes of personal items"
+    ],
+    "requiredInfo": [
+      "Detailed inventory of contents",
+      "Estimated total value",
+      "Purpose of importation",
+      "Shipper and recipient identification"
+    ],
+    "processingTime": "Typically faster clearance",
+    "duties": "Usually duty-free for eligible items"
+  },
+  "c72": {
+    "title": "Form C72 - Import Declaration Form",
+    "description": "Full customs entry required for commercial shipments, high-value personal effects, or items requiring formal assessment.",
+    "valueLimit": "No specific limit, but required for shipments exceeding C73 allowances",
+    "eligibility": [
+      "Commercial shipments",
+      "New merchandise",
+      "High-value personal effects exceeding C73 limits",
+      "Prohibited/restricted items requiring special permits"
+    ],
+    "requiredInfo": [
+      "Complete commercial invoice",
+      "Detailed packing list",
+      "Import licenses (if required)",
+      "Payment method for duties/taxes"
+    ],
+    "processingTime": "Longer processing due to formal assessment",
+    "duties": "Duties and taxes assessed based on item classification and value"
+  },
+  "comparison": [
+    {
+      "aspect": "Value Limit",
+      "c73": "Up to US$500",
+      "c72": "No limit, formal assessment"
+    },
+    {
+      "aspect": "Processing Time",
+      "c73": "Faster",
+      "c72": "Slower, formal process"
+    },
+    {
+      "aspect": "Documentation",
+      "c73": "Simplified inventory",
+      "c72": "Full commercial documentation"
+    },
+    {
+      "aspect": "Cost",
+      "c73": "Usually duty-free",
+      "c72": "Duties and taxes apply"
+    },
+    {
+      "aspect": "Use Case",
+      "c73": "Personal effects/barrels",
+      "c72": "Commercial/high-value items"
+    }
+  ],
+  "whenC72Required": [
+    "Declared value exceeds C73 limits",
+    "Commercial merchandise",
+    "Certain electronics or high-value items",
+    "Items requiring import permits",
+    "Shipments flagged for inspection"
+  ],
+  "tips": [
+    "Accurately declare values to avoid C72 escalation",
+    "Keep detailed receipts for valuable items",
+    "Consult with us before shipping high-value items",
+    "Some items may require C72 regardless of value"
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "C73 vs C72 Customs Forms for Guyana Shipments",
+    "description": "Understanding the difference between C73 and C72 customs forms for shipping personal effects to Guyana.",
+    "author": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    }
+  }
+}

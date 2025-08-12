@@ -1,0 +1,46 @@
+{
+  "name": "airxpress",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "dev:convex": "convex dev",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/s3-request-presigner": "^3.400.0",
+    "@clerk/nextjs": "^4.29.0",
+    "@convex-dev/auth": "^0.0.76",
+    "@stripe/react-stripe-js": "^3.9.0",
+    "@stripe/stripe-js": "^2.1.0",
+    "@types/nodemailer": "^6.4.17",
+    "convex": "^1.13.0",
+    "next": "15.0.0",
+    "nodemailer": "^7.0.5",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "stripe": "^14.4.0",
+    "zod": "^4.0.16"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.0.0",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/stripe": "^8.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "typescript": "^5"
+  }
+}

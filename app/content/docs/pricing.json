@@ -1,0 +1,133 @@
+---
+title: Barrel and Box Shipping Rates to Guyana and Caribbean
+description: Transparent pricing for barrel and box shipping from New Jersey to Guyana and Caribbean destinations.
+---
+{
+  "title": "Barrel and Box Shipping Rates",
+  "intro": "Our flat-rate pricing makes it easy to understand shipping costs to Guyana and Caribbean destinations. Rates include pickup from New Jersey, JFK processing, and delivery to destination airports.",
+  "packages": [
+    {
+      "type": "Half Barrel",
+      "description": "Standard 30-gallon plastic barrel",
+      "dimensions": "Up to 18\" diameter × 30\" height",
+      "weightLimit": "Up to 75 lbs",
+      "price": {
+        "standard": 95,
+        "express": 120,
+        "nfo": 145
+      }
+    },
+    {
+      "type": "Full Barrel",
+      "description": "Standard 55-gallon plastic or metal barrel",
+      "dimensions": "Up to 22\" diameter × 35\" height",
+      "weightLimit": "Up to 150 lbs",
+      "price": {
+        "standard": 120,
+        "express": 150,
+        "nfo": 180
+      }
+    },
+    {
+      "type": "Extra Large Box",
+      "description": "Large carton or box exceeding standard parcel size",
+      "dimensions": "Over 30\" in any dimension",
+      "weightLimit": "Up to 100 lbs",
+      "price": {
+        "standard": 110,
+        "express": 135,
+        "nfo": 165
+      }
+    },
+    {
+      "type": "Standard Box",
+      "description": "Multiple boxes within normal parcel dimensions",
+      "dimensions": "Each box under 30\" in any dimension",
+      "weightLimit": "Combined up to 150 lbs",
+      "price": {
+        "standard": 3.50,
+        "express": 4.50,
+        "nfo": 5.50,
+        "unit": "per pound"
+      }
+    }
+  ],
+  "surcharges": [
+    {
+      "name": "After-Hours Pickup",
+      "description": "Pickup between 4:00 PM - 8:00 AM",
+      "fee": 25,
+      "type": "flat"
+    },
+    {
+      "name": "Oversize Fee",
+      "description": "Barrels or boxes exceeding standard dimensions",
+      "fee": 15,
+      "type": "flat"
+    },
+    {
+      "name": "Dangerous Goods Handling",
+      "description": "Lithium batteries, exempt quantities of liquids, etc.",
+      "fee": 35,
+      "type": "flat"
+    },
+    {
+      "name": "Repack Service",
+      "description": "Professional repacking for proper shipping",
+      "fee": 40,
+      "type": "flat"
+    },
+    {
+      "name": "Extended Storage",
+      "description": "Beyond 3 business days at JFK facility",
+      "fee": 10,
+      "type": "per day"
+    }
+  ],
+  "serviceLevels": [
+    {
+      "name": "Standard",
+      "description": "Economy service with 2-3 day transit",
+      "cutoff": "10:00 AM ET",
+      "transit": "2-3 days"
+    },
+    {
+      "name": "Express",
+      "description": "Priority service with next-day transit",
+      "cutoff": "2:00 PM ET",
+      "transit": "1 day"
+    },
+    {
+      "name": "Next Flight Out",
+      "description": "Urgent shipment on next available flight",
+      "cutoff": "Call for availability",
+      "transit": "Same day when possible"
+    }
+  ],
+  "paymentOptions": [
+    "Credit/Debit Card (online or over phone)",
+    "ACH Bank Transfer",
+    "Cash (pickup only)",
+    "Certified Check (48-hour clearing)"
+  ],
+  "pricingNotes": [
+    "All rates quoted in USD",
+    "Additional fees may apply for remote pickup locations",
+    "Weight-based pricing applies to shipments exceeding package dimensions",
+    "Minimum charge applies to all shipments regardless of actual weight"
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Barrel and Box Shipping Rates to Guyana and Caribbean",
+    "description": "Transparent pricing for barrel and box shipping from New Jersey to Guyana and Caribbean destinations.",
+    "author": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    }
+  }
+}

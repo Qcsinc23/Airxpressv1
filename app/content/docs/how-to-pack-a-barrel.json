@@ -1,0 +1,85 @@
+---
+title: How to Pack a Barrel for Shipping to Guyana
+description: Step-by-step guide for properly packing barrels for shipping to Guyana with C73 customs documentation.
+---
+{
+  "title": "How to Pack a Barrel for Shipping to Guyana",
+  "intro": "Properly packing your barrel is essential for protecting your belongings during transit and ensuring smooth customs clearance in Guyana. Follow these steps to prepare your barrel for shipping.",
+  "steps": [
+    {
+      "title": "Choose the Right Barrel",
+      "description": "Use a standard 55-gallon plastic or metal barrel with a secure screw-top lid. Ensure the barrel is clean and in good condition with no leaks."
+    },
+    {
+      "title": "Prepare Heavy Items",
+      "description": "Place heavy items like books, tools, or canned goods at the bottom of the barrel. This prevents lighter items from being crushed during handling."
+    },
+    {
+      "title": "Wrap Fragile Items",
+      "description": "Wrap all fragile items individually in bubble wrap or newspaper. Mark wrapped items as 'FRAGILE' with tape."
+    },
+    {
+      "title": "Pack Strategically",
+      "description": "Fill empty spaces with clothing, towels, or packing paper to prevent items from shifting during transit. Avoid overpacking the barrel."
+    },
+    {
+      "title": "Seal Properly",
+      "description": "Close the barrel securely and seal the lid with waterproof tape. Do not over-tighten metal lids as this can cause distortion."
+    },
+    {
+      "title": "Label Clearly",
+      "description": "Attach a durable shipping label with the recipient's complete address. Include your return address and mark any special handling requirements."
+    }
+  ],
+  "prohibitedItems": [
+    {
+      "category": "Dangerous Goods",
+      "items": [
+        "Flammable liquids (gasoline, alcohol, etc.)",
+        "Aerosols and pressurized containers",
+        "Corrosive substances (battery acid, etc.)",
+        "Oxidizing agents",
+        "Infectious substances"
+      ]
+    },
+    {
+      "category": "Legal Prohibitions",
+      "items": [
+        "Weapons and ammunition",
+        "Illicit drugs and controlled substances",
+        "Counterfeit goods",
+        "Stolen property"
+      ]
+    },
+    {
+      "category": "Perishables",
+      "items": [
+        "Fresh fruits and vegetables",
+        "Meat and dairy products",
+        "Live plants or animals",
+        "Items requiring refrigeration"
+      ]
+    }
+  ],
+  "tips": [
+    "Keep a detailed inventory of barrel contents for customs declaration",
+    "Do not pack liquids in glass containers unless triple-wrapped",
+    "Include receipts for valuable items to establish value for customs",
+    "Use plastic bags to protect items from moisture",
+    "Don't pack essentials you'll need immediately - send them in a separate, faster shipment"
+  ],
+  "jsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How to Pack a Barrel for Shipping to Guyana",
+    "description": "Step-by-step guide for properly packing barrels for shipping to Guyana with C73 customs documentation.",
+    "author": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AirXpress"
+    }
+  }
+}
