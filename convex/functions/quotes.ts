@@ -1,12 +1,12 @@
 // convex/functions/quotes.ts
-import { mutation, query } from "./_generated/server";
+import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { Id } from "./_generated/dataModel";
+import { Id } from "../_generated/dataModel";
 
 // Create a new quote
 export const createQuote = mutation({
   args: {
-    input: {
+    input: v.object({
       originZip: v.string(),
       destCountry: v.string(),
       destCity: v.optional(v.string()),
@@ -26,7 +26,7 @@ export const createQuote = mutation({
       ),
       afterHours: v.optional(v.boolean()),
       isPersonalEffects: v.optional(v.boolean()),
-    },
+    }),
     computedRates: v.array(v.object({
       laneId: v.string(),
       carrier: v.string(),

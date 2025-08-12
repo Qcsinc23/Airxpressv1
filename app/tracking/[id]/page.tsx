@@ -2,6 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import Breadcrumb, { TrackingProcessBreadcrumbs } from '../../components/ui/Breadcrumb';
 
 interface TrackingEvent {
   timestamp: string;
@@ -25,20 +27,17 @@ interface TrackingData {
   };
 }
 
-interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export default async function TrackingPage({ params }: PageProps) {
-  const { id } = await params;
+export default function TrackingPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchTrackingData();
+    if (id) {
+      fetchTrackingData();
+    }
   }, [id]);
 
   const fetchTrackingData = async () => {
@@ -141,6 +140,12 @@ export default async function TrackingPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb 
+          items={TrackingProcessBreadcrumbs.details(id)} 
+          className="mb-6"
+        />
+
         {/* Header */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="p-6">

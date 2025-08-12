@@ -10,6 +10,7 @@ import PackagingSelector from '../components/quote/PackagingSelector';
 import BookingForm, { PickupDetails } from '../components/booking/BookingForm';
 import CheckoutForm from '../components/payment/CheckoutForm';
 import { Rate, RateInput } from '../types/shipping';
+import Breadcrumb, { QuoteProcessBreadcrumbs } from '../components/ui/Breadcrumb';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
@@ -132,9 +133,30 @@ export default function QuotePage() {
     setCurrentStep('booking');
   };
 
+  // Get current breadcrumb based on step
+  const getCurrentBreadcrumbs = () => {
+    switch (currentStep) {
+      case 'quote':
+        return QuoteProcessBreadcrumbs.getQuote;
+      case 'results':
+        return QuoteProcessBreadcrumbs.selectRate;
+      case 'booking':
+      case 'payment':
+        return QuoteProcessBreadcrumbs.bookAndPay;
+      default:
+        return QuoteProcessBreadcrumbs.getQuote;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb 
+          items={getCurrentBreadcrumbs()} 
+          className="mb-6"
+        />
+
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">

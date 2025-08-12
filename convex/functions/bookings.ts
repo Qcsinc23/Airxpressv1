@@ -1,5 +1,5 @@
 // convex/functions/bookings.ts
-import { mutation, query } from "./_generated/server";
+import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
 
 // Create a new booking
@@ -18,7 +18,7 @@ export const createBooking = mutation({
     const booking = {
       quoteId: args.quoteId,
       userId: args.userId,
-      status: "NEW",
+      status: "NEW" as const,
       trackingEvents: [{
         timestamp: new Date().toISOString(),
         status: "BOOKING_CREATED",

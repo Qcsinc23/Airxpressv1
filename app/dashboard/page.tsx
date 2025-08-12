@@ -3,6 +3,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
+import Breadcrumb, { DashboardBreadcrumbs } from '../components/ui/Breadcrumb';
 
 interface BookingSummary {
   id: string;
@@ -113,6 +114,12 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb 
+          items={DashboardBreadcrumbs.main} 
+          className="mb-6"
+        />
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>

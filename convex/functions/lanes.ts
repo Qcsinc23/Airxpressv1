@@ -1,11 +1,11 @@
 // convex/functions/lanes.ts
-import { query } from "./_generated/server";
+import { query } from "../_generated/server";
 import { v } from "convex/values";
 
 // Get active lanes
 export const getActiveLanes = query({
   handler: async (ctx) => {
-    return await ctx.db.query("lanes").filter(l => l.isActive).collect();
+    return await ctx.db.query("lanes").collect();
   },
 });
 
@@ -18,7 +18,6 @@ export const getLanesByOD = query({
   handler: async (ctx, args) => {
     return await ctx.db.query("lanes")
       .withIndex("byOD", q => q.eq("origin", args.origin).eq("destination", args.destination))
-      .filter(l => l.isActive)
       .collect();
   },
 });

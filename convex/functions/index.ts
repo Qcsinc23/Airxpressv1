@@ -1,5 +1,5 @@
 // convex/functions/index.ts
-import { internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "../_generated/server";
 
 // Export all functions
 export { createQuote, getQuote, getQuotesByUser } from "./quotes";

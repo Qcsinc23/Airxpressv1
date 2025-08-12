@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Breadcrumb, { TrackingProcessBreadcrumbs } from '../components/ui/Breadcrumb';
 
 export default function TrackingSearchPage() {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -25,6 +26,12 @@ export default function TrackingSearchPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb 
+          items={TrackingProcessBreadcrumbs.search} 
+          className="mb-6"
+        />
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Track Your Shipment</h1>
