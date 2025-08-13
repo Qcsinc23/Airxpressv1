@@ -3,6 +3,8 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import Header from '../components/ui/Header';
+import Breadcrumb from '../components/ui/Breadcrumb';
 
 export default function SupportPage() {
   const { user } = useUser();
@@ -64,44 +66,60 @@ export default function SupportPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="bg-white/80 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
+          <div className="max-w-2xl mx-auto px-4">
+            <div className="bg-white/80 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Request Submitted</h1>
+                <p className="text-gray-600 mb-6">
+                  Thank you for contacting us. We've received your support request and will respond within 24 hours.
+                </p>
+                <p className="text-sm text-gray-500 mb-6">
+                  For urgent matters, please call us directly at <span className="font-semibold">201-249-0929</span>
+                </p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Submit Another Request
+                </button>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">Request Submitted</h1>
-              <p className="text-gray-600 mb-6">
-                Thank you for contacting us. We've received your support request and will respond within 24 hours.
-              </p>
-              <p className="text-sm text-gray-500 mb-6">
-                For urgent matters, please call us directly at <span className="font-semibold">(201) 823-1974</span>
-              </p>
-              <button
-                onClick={() => setSubmitted(false)}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Submit Another Request
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Our Support Team</h1>
-          <p className="text-xl text-gray-600">We're here to help with your shipping needs</p>
-        </div>
+  const supportBreadcrumbs = [
+    { label: 'Home', href: '/' },
+    { label: 'Support', href: '/support' }
+  ];
 
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb 
+            items={supportBreadcrumbs} 
+            className="mb-8"
+          />
+
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Our Support Team</h1>
+            <p className="text-xl text-gray-600">We're here to help with your shipping needs</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* 24/7 Phone Support */}
           <div className="bg-white/80 backdrop-blur-lg border border-white/20 shadow-lg rounded-xl p-6 text-center">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -110,7 +128,7 @@ export default function SupportPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">Phone Support</h3>
-            <p className="text-2xl font-bold text-blue-600 mb-2">(201) 823-1974</p>
+            <p className="text-2xl font-bold text-blue-600 mb-2">201-249-0929</p>
             <p className="text-sm text-gray-600">Available 24/7 for urgent matters</p>
           </div>
 
@@ -122,7 +140,7 @@ export default function SupportPage() {
               </svg>
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">Email Support</h3>
-            <p className="text-lg font-medium text-green-600 mb-2">support@cargoexpressnj.com</p>
+            <p className="text-sm font-medium text-green-600 mb-2 break-all">support@cargoexpressnj.com</p>
             <p className="text-sm text-gray-600">Response within 24 hours</p>
           </div>
 
@@ -137,10 +155,10 @@ export default function SupportPage() {
             <p className="text-lg font-medium text-purple-600 mb-2">Coming Soon</p>
             <p className="text-sm text-gray-600">Real-time assistance</p>
           </div>
-        </div>
+          </div>
 
-        {/* Contact Form */}
-        <div className="bg-white/80 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
+          {/* Contact Form */}
+          <div className="bg-white/80 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -266,8 +284,9 @@ export default function SupportPage() {
               {submitting ? 'Submitting...' : 'Send Message'}
             </button>
           </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
