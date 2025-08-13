@@ -12,6 +12,8 @@ import audit from "./schemas/audit";
 import flags from "./schemas/flags";
 import documents from "./schemas/documents";
 import onboarding from "./schemas/onboarding";
+import { agentsSchema } from "./schemas/agents";
+import { slaSchema } from "./schemas/sla";
 
 // Merge all schemas
 const mergedSchema = {
@@ -25,6 +27,8 @@ const mergedSchema = {
   ...flags.tables,
   ...documents.tables,
   ...onboarding.tables,
+  ...agentsSchema,
+  ...slaSchema,
 };
 
 export default defineSchema(mergedSchema);

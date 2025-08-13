@@ -1,263 +1,420 @@
 // app/dashboard/admin/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Role, Permission, hasPermission, hasRole } from '../../lib/auth/rbac';
-
-interface AdminStats {
-  totalUsers: number;
-  totalBookings: number;
-  totalRevenue: number;
-  activeShipments: number;
-  avgDeliveryTime: number;
-  customerSatisfaction: number;
-}
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 
 export default function AdminDashboard() {
-  const { user, isLoaded } = useUser();
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useUser();
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'sla' | 'users' | 'system'>('overview');
 
   // Check if user has admin access
-  const userRole = (user?.publicMetadata?.role as Role) || Role.USER;
-  const hasAdminAccess = hasRole(userRole, Role.ADMIN);
+  const hasAdminAccess = user?.publicMetadata?.role === 'admin';
 
-  useEffect(() => {
-    if (isLoaded && user && hasAdminAccess) {
-      fetchAdminStats();
-    } else if (isLoaded && !hasAdminAccess) {
-      setError('Access denied: Admin role required');
-      setLoading(false);
-    }
-  }, [isLoaded, user, hasAdminAccess]);
+  // Get system data
+  const allBookings = useQuery(api.bookings.getOpsBookings) || [];
+  const activeBreaches = useQuery(api.sla.getActiveBreaches) || [];
+  
+  // Mutations
+  const initializeSlaTemplates = useMutation(api["sla-defaults"].initializeDefaultSlaTemplates);
 
-  const fetchAdminStats = async () => {
+  const handleInitializeSla = async () => {
     try {
-      setLoading(true);
-      
-      // TODO: Implement admin stats API
-      // const response = await fetch('/api/admin/stats');
-      // const data = await response.json();
-      
-      // Mock data for now
-      const mockStats: AdminStats = {
-        totalUsers: 1250,
-        totalBookings: 3840,
-        totalRevenue: 450000,
-        activeShipments: 156,
-        avgDeliveryTime: 1.3,
-        customerSatisfaction: 4.8,
-      };
-      
-      setStats(mockStats);
-    } catch (err) {
-      console.error('Admin stats error:', err);
-      setError('Failed to load admin statistics');
-    } finally {
-      setLoading(false);
+      const result = await initializeSlaTemplates({});
+      alert(result.message);
+    } catch (error) {
+      console.error('Failed to initialize SLA templates:', error);
+      alert('Failed to initialize SLA templates');
     }
   };
 
-  if (!isLoaded || loading) {
+  if (!hasAdminAccess) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (error || !hasAdminAccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>{error || 'Access denied: Admin role required'}</p>
-            <a href="/dashboard" className="text-red-800 underline">
-              Return to Dashboard
-            </a>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
           </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-6">You need administrator privileges to access this dashboard.</p>
+          <a
+            href="/dashboard"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Return to Dashboard
+          </a>
         </div>
       </div>
     );
   }
+
+  // Calculate system metrics
+  const totalUsers = 0; // Would need user query
+  const totalAgents = 0; // Would need agent count query
+  const activeBookingsCount = allBookings.filter(b => 
+    ['NEW', 'NEEDS_DOCS', 'READY_TO_TENDER', 'IN_TRANSIT'].includes(b.status)
+  ).length;
+  const criticalBreaches = activeBreaches.filter(b => b.severity === 'critical' && !b.resolved).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">System overview and management tools</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="text-gray-600 mt-1">System configuration and management</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <span className="text-sm text-gray-600">Welcome, {user?.firstName}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* System Status Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-blue-100 rounded-full">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-2xl font-bold text-gray-900">{allBookings.length}</p>
+                <p className="text-sm text-gray-600">Total Bookings</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-green-100 rounded-full">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-2xl font-bold text-gray-900">{totalAgents}</p>
+                <p className="text-sm text-gray-600">Active Agents</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-orange-100 rounded-full">
+                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-2xl font-bold text-gray-900">{activeBookingsCount}</p>
+                <p className="text-sm text-gray-600">Active Shipments</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-red-100 rounded-full">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-2xl font-bold text-gray-900">{criticalBreaches}</p>
+                <p className="text-sm text-gray-600">Critical SLA Breaches</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Stats Grid */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.totalUsers.toLocaleString()}</h3>
-                  <p className="text-sm text-gray-500">Total Users</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.totalBookings.toLocaleString()}</h3>
-                  <p className="text-sm text-gray-500">Total Bookings</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">${stats.totalRevenue.toLocaleString()}</h3>
-                  <p className="text-sm text-gray-500">Total Revenue</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.activeShipments}</h3>
-                  <p className="text-sm text-gray-500">Active Shipments</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.avgDeliveryTime} days</h3>
-                  <p className="text-sm text-gray-500">Avg Delivery Time</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-pink-100 rounded-lg">
-                  <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{stats.customerSatisfaction}/5</h3>
-                  <p className="text-sm text-gray-500">Customer Satisfaction</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Admin Tools */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* System Management */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">System Management</h2>
-              <div className="space-y-4">
-                <a href="/dashboard/admin/users" className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="p-2 bg-blue-100 rounded mr-3">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-medium">User Management</div>
-                    <div className="text-sm text-gray-500">Manage user accounts and roles</div>
-                  </div>
-                </a>
-
-                <a href="/dashboard/admin/rates" className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="p-2 bg-green-100 rounded mr-3">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-medium">Rate Management</div>
-                    <div className="text-sm text-gray-500">Configure shipping rates and lanes</div>
-                  </div>
-                </a>
-
-                <a href="/dashboard/admin/system" className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="p-2 bg-purple-100 rounded mr-3">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-medium">System Configuration</div>
-                    <div className="text-sm text-gray-500">App settings and integrations</div>
-                  </div>
-                </a>
-              </div>
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="border-b border-gray-200">
+            <div className="flex space-x-8 px-6">
+              {[
+                { id: 'overview', name: 'System Overview', icon: '📊' },
+                { id: 'sla', name: 'SLA Configuration', icon: '⏱️' },
+                { id: 'system', name: 'System Settings', icon: '⚙️' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                    activeTab === tab.id
+                      ? 'border-purple-500 text-purple-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.name}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Reports & Analytics */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Reports & Analytics</h2>
-              <div className="space-y-4">
-                <a href="/dashboard/admin/analytics" className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="p-2 bg-yellow-100 rounded mr-3">
-                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-medium">Business Analytics</div>
-                    <div className="text-sm text-gray-500">Revenue, trends, and performance</div>
-                  </div>
-                </a>
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">System Health</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Recent Activity</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Bookings Today</span>
+                          <span className="font-medium">{allBookings.filter(b => 
+                            new Date(b.createdAt).toDateString() === new Date().toDateString()
+                          ).length}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Active SLA Breaches</span>
+                          <span className={`font-medium ${activeBreaches.filter(b => !b.resolved).length > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {activeBreaches.filter(b => !b.resolved).length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">System Status</span>
+                          <span className="font-medium text-green-600">Operational</span>
+                        </div>
+                      </div>
+                    </div>
 
-                <a href="/dashboard/admin/reports" className="flex items-center p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="p-2 bg-red-100 rounded mr-3">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Quick Actions</h4>
+                      <div className="space-y-2">
+                        <button
+                          onClick={handleInitializeSla}
+                          className="w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50 text-sm"
+                        >
+                          Initialize Default SLA Templates
+                        </button>
+                        <a 
+                          href="/dashboard/ops"
+                          className="block w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50 text-sm"
+                        >
+                          View Operations Dashboard
+                        </a>
+                        <a 
+                          href="/dashboard/ops/sla"
+                          className="block w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50 text-sm"
+                        >
+                          Monitor SLA Breaches
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium">Generated Reports</div>
-                    <div className="text-sm text-gray-500">Export data and custom reports</div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">System Alerts</h3>
+                  <div className="space-y-3">
+                    {criticalBreaches > 0 && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+                        <svg className="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p className="font-medium text-red-800">Critical SLA Breaches</p>
+                          <p className="text-sm text-red-600">{criticalBreaches} critical breaches require immediate attention</p>
+                        </div>
+                        <a
+                          href="/dashboard/ops/sla"
+                          className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                        >
+                          View
+                        </a>
+                      </div>
+                    )}
+                    
+                    {criticalBreaches === 0 && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                        <svg className="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-green-800">All systems operational - no critical alerts</p>
+                      </div>
+                    )}
                   </div>
-                </a>
+                </div>
               </div>
-            </div>
+            )}
+
+            {activeTab === 'sla' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">SLA Configuration</h3>
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Add SLA Template
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Default SLA Templates</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-white rounded border p-3">
+                        <h5 className="font-medium text-gray-900">Standard Pickup</h5>
+                        <p className="text-sm text-gray-600 mt-1">24 hours from booking</p>
+                        <div className="mt-2 flex space-x-2">
+                          <button className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Active</button>
+                          <button className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200">Edit</button>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded border p-3">
+                        <h5 className="font-medium text-gray-900">JetPak Delivery</h5>
+                        <p className="text-sm text-gray-600 mt-1">2 business days</p>
+                        <div className="mt-2 flex space-x-2">
+                          <button className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Active</button>
+                          <button className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200">Edit</button>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded border p-3">
+                        <h5 className="font-medium text-gray-900">Document Completion</h5>
+                        <p className="text-sm text-gray-600 mt-1">48 hours from booking</p>
+                        <div className="mt-2 flex space-x-2">
+                          <button className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Active</button>
+                          <button className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200">Edit</button>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded border p-3">
+                        <h5 className="font-medium text-gray-900">Customer Response</h5>
+                        <p className="text-sm text-gray-600 mt-1">4 hours maximum</p>
+                        <div className="mt-2 flex space-x-2">
+                          <button className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Active</button>
+                          <button className="text-xs px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200">Edit</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Configuration Actions</h4>
+                    <div className="space-y-2">
+                      <button
+                        onClick={handleInitializeSla}
+                        className="w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-3">🚀</span>
+                          <div>
+                            <p className="font-medium">Initialize Default Templates</p>
+                            <p className="text-sm text-gray-600">Create standard SLA templates</p>
+                          </div>
+                        </div>
+                      </button>
+                      <a 
+                        href="/dashboard/ops/sla"
+                        className="block w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-3">📊</span>
+                          <div>
+                            <p className="font-medium">View SLA Reports</p>
+                            <p className="text-sm text-gray-600">Compliance and performance analytics</p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'system' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">System Settings</h3>
+                <div className="space-y-6">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Application Settings</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">Auto-assign Agents</p>
+                          <p className="text-sm text-gray-600">Automatically assign agents to new bookings</p>
+                        </div>
+                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors">
+                          <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">SLA Monitoring</p>
+                          <p className="text-sm text-gray-600">Enable automatic SLA breach detection</p>
+                        </div>
+                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors">
+                          <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">Email Notifications</p>
+                          <p className="text-sm text-gray-600">Send email alerts for critical events</p>
+                        </div>
+                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors">
+                          <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">System Management</h4>
+                    <div className="space-y-2">
+                      <a 
+                        href="/dashboard/ops"
+                        className="block w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-3">🏢</span>
+                          <div>
+                            <p className="font-medium">Operations Dashboard</p>
+                            <p className="text-sm text-gray-600">Monitor all bookings and agents</p>
+                          </div>
+                        </div>
+                      </a>
+                      <a 
+                        href="/dashboard/agent/setup"
+                        className="block w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-3">👥</span>
+                          <div>
+                            <p className="font-medium">Agent Management</p>
+                            <p className="text-sm text-gray-600">Configure agent profiles and coverage</p>
+                          </div>
+                        </div>
+                      </a>
+                      <button className="w-full text-left px-3 py-2 bg-white rounded border hover:bg-gray-50">
+                        <div className="flex items-center">
+                          <span className="mr-3">📊</span>
+                          <div>
+                            <p className="font-medium">System Report</p>
+                            <p className="text-sm text-gray-600">Generate comprehensive system health report</p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

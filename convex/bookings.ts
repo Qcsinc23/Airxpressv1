@@ -13,6 +13,7 @@ export const createBooking = mutation({
       specialInstructions: v.optional(v.string()),
     }),
     paymentIntentId: v.string(),
+    autoAssignAgent: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     // Create the booking
@@ -37,6 +38,46 @@ export const createBooking = mutation({
       userId: args.userId,
       bookingId: bookingId,
     });
+
+    // Create SLA commitments for this booking
+    try {
+      await ctx.runMutation("sla:createSlaCommitments", {
+        bookingId: bookingId,
+      });
+    } catch (error) {
+      console.warn("Failed to create SLA commitments:", error);
+      // Continue without SLA - this is not a critical failure
+    }
+
+    // Auto-assign agent if requested and agents are available
+    if (args.autoAssignAgent) {
+      try {
+        await ctx.runMutation("agents:autoAssignBooking", {
+          bookingId: bookingId,
+          assignedBy: args.userId, // System assignment
+          priority: "normal",
+        });
+        
+        // Add tracking event for agent assignment
+        const booking = await ctx.db.get(bookingId);
+        if (booking) {
+          await ctx.db.patch(bookingId, {
+            trackingEvents: [
+              ...booking.trackingEvents,
+              {
+                timestamp: new Date().toISOString(),
+                status: "AGENT_ASSIGNED",
+                notes: "Agent automatically assigned for pickup coordination",
+              }
+            ],
+            updatedAt: Date.now(),
+          });
+        }
+      } catch (error) {
+        console.warn("Failed to auto-assign agent:", error);
+        // Continue without assignment - this is not a critical failure
+      }
+    }
 
     return bookingId;
   },
@@ -124,19 +165,81 @@ export const getOpsBookings = query({
       .order("desc")
       .collect();
 
-    // Get progress for each booking
-    const bookingsWithProgress = await Promise.all(
+    // Get progress and agent assignment for each booking
+    const bookingsWithDetails = await Promise.all(
       bookings.map(async (booking) => {
+        // Get progress
         const progress = await ctx.runQuery("onboarding:getBookingProgress", {
           bookingId: booking._id,
         });
+        
+        // Get agent assignment if any
+        const assignment = await ctx.db
+          .query("agentAssignments")
+          .withIndex("by_booking", (q) => q.eq("bookingId", booking._id))
+          .order("desc")
+          .first();
+        
+        let assignedAgent = null;
+        if (assignment) {
+          assignedAgent = await ctx.db.get(assignment.agentId);
+        }
+        
         return {
           ...booking,
           progress,
+          assignment,
+          assignedAgent,
         };
       })
     );
 
-    return bookingsWithProgress;
+    return bookingsWithDetails;
+  },
+});
+
+// New query for agent-specific bookings (role-based filtering)
+export const getAgentAreaBookings = query({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, { agentId }) => {
+    const agent = await ctx.db.get(agentId);
+    if (!agent) {
+      return [];
+    }
+
+    // Get all unassigned bookings in agent's coverage area
+    const allBookings = await ctx.db
+      .query("bookings")
+      .withIndex("byStatus")
+      .filter((q) => q.or(
+        q.eq(q.field("status"), "NEW"),
+        q.eq(q.field("status"), "NEEDS_DOCS")
+      ))
+      .collect();
+
+    // Filter bookings based on agent's coverage area
+    // For now, this is simplified - in production, you'd use geographic filtering
+    const eligibleBookings = allBookings.filter(booking => {
+      // Check if booking has no current assignment
+      return booking.pickupDetails?.address && 
+             agent.coverage.states.some(state => 
+               booking.pickupDetails?.address.includes(state)
+             );
+    });
+
+    // Get only unassigned bookings
+    const unassignedBookings = [];
+    for (const booking of eligibleBookings) {
+      const existingAssignment = await ctx.db
+        .query("agentAssignments")
+        .withIndex("by_booking", (q) => q.eq("bookingId", booking._id))
+        .first();
+        
+      if (!existingAssignment) {
+        unassignedBookings.push(booking);
+      }
+    }
+
+    return unassignedBookings;
   },
 });

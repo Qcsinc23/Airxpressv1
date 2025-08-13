@@ -77,12 +77,20 @@ export default function OpsPage() {
     }
   };
 
-  const BookingCard = ({ booking }: { booking: BookingCard }) => (
+  const BookingCard = ({ booking }: { booking: BookingCard & { assignment?: any; assignedAgent?: any } }) => (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">
         <div>
           <h4 className="font-semibold text-gray-900">{booking._id}</h4>
           <p className="text-sm text-gray-600">{booking.pickupDetails.contact}</p>
+          {booking.assignedAgent && (
+            <div className="flex items-center mt-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              <p className="text-xs text-green-600 font-medium">
+                Agent: {booking.assignedAgent.contact?.phone || 'Unknown'}
+              </p>
+            </div>
+          )}
         </div>
         <div className="text-right">
           <div className="text-lg font-bold text-blue-600">
@@ -126,18 +134,34 @@ export default function OpsPage() {
         </button>
         
         <div className="grid grid-cols-2 gap-2">
+          {!booking.assignedAgent ? (
+            <button
+              onClick={async () => {
+                try {
+                  // This would call the auto-assignment function
+                  alert('Auto-assign agent feature integration needed');
+                } catch (error) {
+                  alert('Failed to assign agent');
+                }
+              }}
+              className="text-xs bg-green-50 text-green-700 py-1 px-2 rounded hover:bg-green-100 transition-colors"
+            >
+              👤 Assign Agent
+            </button>
+          ) : (
+            <button
+              onClick={() => alert(`Agent: ${booking.assignedAgent.contact?.phone}`)}
+              className="text-xs bg-green-50 text-green-700 py-1 px-2 rounded hover:bg-green-100 transition-colors"
+            >
+              👤 View Agent
+            </button>
+          )}
+          
           <button
             onClick={() => alert('Request missing docs feature coming soon')}
             className="text-xs bg-orange-50 text-orange-700 py-1 px-2 rounded hover:bg-orange-100 transition-colors"
           >
             📄 Request Docs
-          </button>
-          
-          <button
-            onClick={() => alert('Add storage feature coming soon')}
-            className="text-xs bg-yellow-50 text-yellow-700 py-1 px-2 rounded hover:bg-yellow-100 transition-colors"
-          >
-            📦 Add Storage
           </button>
         </div>
 
@@ -156,6 +180,12 @@ export default function OpsPage() {
         <p className="text-xs text-gray-500">
           Created: {new Date(booking.createdAt).toLocaleDateString()}
         </p>
+        {booking.assignment && (
+          <p className="text-xs text-gray-500">
+            Assigned: {new Date(booking.assignment.assignedAt).toLocaleDateString()}
+            {booking.assignment.autoAssigned && <span className="ml-1 text-blue-500">(Auto)</span>}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -213,7 +243,15 @@ export default function OpsPage() {
         {/* Quick Actions */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-4 gap-4">
+            <a 
+              href="/dashboard/ops/sla"
+              className="p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+            >
+              <div className="text-red-600 font-semibold">🚨 SLA Monitor</div>
+              <p className="text-sm text-red-600 mt-1">View breaches & metrics</p>
+            </a>
+            
             <button className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
               <div className="text-blue-600 font-semibold">📊 Daily Report</div>
               <p className="text-sm text-blue-600 mt-1">Generate today's summary</p>

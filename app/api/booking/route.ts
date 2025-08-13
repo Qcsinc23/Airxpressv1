@@ -22,6 +22,7 @@ const BookingRequestSchema = z.object({
     specialInstructions: z.string().optional(),
   }),
   paymentMethodId: z.string().min(1, 'Payment method is required'),
+  autoAssignAgent: z.boolean().optional().default(true), // Enable auto-assignment by default
 });
 
 // POST - Create new booking
@@ -71,12 +72,13 @@ export async function POST(request: NextRequest) {
 
     if (paymentIntent.status === 'succeeded') {
       try {
-        // Create booking in Convex with checklist initialization
+        // Create booking in Convex with checklist initialization and auto-assignment
         const bookingId = await convex.mutation(api.bookings.createBooking, {
           quoteId: validatedData.quoteId as Id<"quotes">,
           userId: userId as Id<"users">,
           pickupDetails: validatedData.pickupDetails,
           paymentIntentId: paymentIntent.id,
+          autoAssignAgent: validatedData.autoAssignAgent,
         });
 
         return NextResponse.json({
