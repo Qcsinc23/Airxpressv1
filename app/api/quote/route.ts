@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
         eligibilityWarnings: getEligibilityWarnings(piecesForPricing),
         disclaimers: [
-          'Airport-to-airport JetPak service only',
+          'Airport-to-airport General Air service',
           'Pickup and delivery not included',
           'Subject to TSA and customs inspection',
           'Rates subject to change without notice',
@@ -145,11 +145,11 @@ export async function POST(request: NextRequest) {
       console.error('Pricing calculation error:', pricingError);
       
       // Handle eligibility errors gracefully
-      if (pricingError instanceof Error && pricingError.message.includes('JetPak')) {
+      if (pricingError instanceof Error && pricingError.message.includes('exceeds')) {
         return NextResponse.json({
           error: 'Eligibility Issue',
           message: pricingError.message,
-          suggestion: 'Consider our General Air service for larger items.',
+          suggestion: 'Please reduce package weight or dimensions, or contact us for alternative shipping options.',
         }, { status: 400 });
       }
       
@@ -196,22 +196,24 @@ function getTransitTime(country: string): number {
 function getEligibilityWarnings(pieces: Array<{ weightKg: number, dimensions?: any }>): string[] {
   const warnings: string[] = [];
   
+  // Use General Air limits (same as defined in engine.ts)
+  const WEIGHT_LIMIT_KG = 100; // General Air weight limit
+  const MAX_DIMENSION_CM = 300; // General Air max dimension per side
+  
   for (const piece of pieces) {
-    if (piece.weightKg > 23) {
-      warnings.push('One or more pieces exceed JetPak weight limit (50 lbs)');
+    if (piece.weightKg > WEIGHT_LIMIT_KG) {
+      warnings.push(`One or more pieces exceed General Air weight limit (${Math.round(WEIGHT_LIMIT_KG * 2.20462)} lbs)`);
       break;
     }
   }
   
   for (const piece of pieces) {
     if (piece.dimensions) {
-      const totalDimensions = (
-        piece.dimensions.lengthCm + 
-        piece.dimensions.widthCm + 
-        piece.dimensions.heightCm
-      );
-      if (totalDimensions > 157) {
-        warnings.push('One or more pieces exceed JetPak dimension limits (62 inches total)');
+      const { lengthCm, widthCm, heightCm } = piece.dimensions;
+      const maxSingleDimension = Math.max(lengthCm, widthCm, heightCm);
+      
+      if (maxSingleDimension > MAX_DIMENSION_CM) {
+        warnings.push(`One or more pieces exceed General Air dimension limits (${Math.round(MAX_DIMENSION_CM / 2.54)} inches per side)`);
         break;
       }
     }
