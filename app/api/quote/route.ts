@@ -10,9 +10,9 @@ const QuoteRequestSchema = z.object({
   destCity: z.string().optional(),
   pieces: z.array(z.object({
     type: z.enum(['barrel', 'box']),
-    weight: z.number().positive('Weight must be positive'),
+    weight: z.number().positive('Weight must be positive'), // Expected in kg (converted by form)
     dimensions: z.object({
-      length: z.number().nonnegative(),
+      length: z.number().nonnegative(), // Expected in cm (converted by form)
       width: z.number().nonnegative(),
       height: z.number().nonnegative(),
     }).optional(),
@@ -58,13 +58,13 @@ export async function POST(request: NextRequest) {
     // Initialize pricing engine with default policy
     const pricingEngine = new PricingEngine(PricingEngine.getDefaultPolicy());
     
-    // Convert pieces to the format expected by pricing engine
+    // Pieces are already converted to kg/cm in the form - no need to convert again
     const piecesForPricing = validatedData.pieces.map(piece => ({
-      weightKg: piece.weight * 0.453592, // Convert lbs to kg
+      weightKg: piece.weight, // Already in kg from form conversion
       dimensions: piece.dimensions ? {
-        lengthCm: piece.dimensions.length * 2.54, // Convert inches to cm
-        widthCm: piece.dimensions.width * 2.54,
-        heightCm: piece.dimensions.height * 2.54,
+        lengthCm: piece.dimensions.length, // Already in cm from form conversion
+        widthCm: piece.dimensions.width,
+        heightCm: piece.dimensions.height,
       } : undefined,
       type: piece.type as 'barrel' | 'box',
     }));
