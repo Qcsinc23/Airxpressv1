@@ -13,6 +13,8 @@ export const createBooking = mutation({
       contact: v.string(),
       specialInstructions: v.optional(v.string()),
     }),
+    paymentIntentId: v.optional(v.string()),
+    autoAssignAgent: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const booking = {
@@ -25,6 +27,7 @@ export const createBooking = mutation({
       }],
       documents: [],
       pickupDetails: args.pickupDetails,
+      paymentId: args.paymentIntentId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -40,7 +43,8 @@ export const updateBookingStatus = mutation({
     bookingId: v.id("bookings"),
     status: v.union(
       v.literal("NEW"),
-      v.literal("PICKUP_SCHEDULED"),
+      v.literal("NEEDS_DOCS"),
+      v.literal("READY_TO_TENDER"),
       v.literal("TENDERED"),
       v.literal("IN_TRANSIT"),
       v.literal("ARRIVED"),
@@ -89,7 +93,8 @@ export const getBookingsByStatus = query({
   args: {
     status: v.union(
       v.literal("NEW"),
-      v.literal("PICKUP_SCHEDULED"),
+      v.literal("NEEDS_DOCS"),
+      v.literal("READY_TO_TENDER"),
       v.literal("TENDERED"),
       v.literal("IN_TRANSIT"),
       v.literal("ARRIVED"),

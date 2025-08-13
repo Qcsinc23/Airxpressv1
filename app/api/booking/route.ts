@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (paymentIntent.status === 'succeeded') {
       try {
         // Create booking in Convex with checklist initialization and auto-assignment
-        const bookingId = await convex.mutation(api.bookings.createBooking, {
+        const bookingId = await convex.mutation(api.functions.bookings.createBooking, {
           quoteId: validatedData.quoteId as Id<"quotes">,
           userId: userId as Id<"users">,
           pickupDetails: validatedData.pickupDetails,
