@@ -20,6 +20,93 @@ export class PricingEngine {
 
   constructor(policy: PricingPolicy) {
     this.policy = policy;
+    this.loadDefaultPackagingSKUs();
+  }
+
+  private loadDefaultPackagingSKUs() {
+    // Load default packaging SKUs (same as in packaging API)
+    const defaultPackaging = [
+      {
+        id: 'sku_plastic_barrel_45l',
+        name: 'Plastic Barrel - 45L',
+        description: 'Heavy duty plastic barrel for general cargo',
+        costUSD: 12.50,
+        sellPriceUSD: Math.ceil(12.50 * 1.80),
+        category: 'barrel' as const,
+        specifications: {
+          maxWeightKg: 30,
+          dimensionsCm: { length: 60, width: 40, height: 40 },
+          material: 'High-density polyethylene',
+        }
+      },
+      {
+        id: 'sku_fiber_barrel_60l',
+        name: 'Fiber Barrel - 60L',
+        description: 'Eco-friendly fiber barrel for food items',
+        costUSD: 15.75,
+        sellPriceUSD: Math.ceil(15.75 * 1.80),
+        category: 'barrel' as const,
+        specifications: {
+          maxWeightKg: 35,
+          dimensionsCm: { length: 65, width: 45, height: 45 },
+          material: 'Recycled cardboard fiber',
+        }
+      },
+      {
+        id: 'sku_econtainer_small',
+        name: 'E-Container Small',
+        description: 'Reusable container for multiple shipments',
+        costUSD: 25.00,
+        sellPriceUSD: Math.ceil(25.00 * 1.80),
+        category: 'container' as const,
+        specifications: {
+          maxWeightKg: 40,
+          dimensionsCm: { length: 70, width: 50, height: 35 },
+          material: 'Reinforced polypropylene',
+        }
+      },
+      {
+        id: 'sku_mini_econ',
+        name: 'Mini E-Container',
+        description: 'Compact container for small items',
+        costUSD: 18.00,
+        sellPriceUSD: Math.ceil(18.00 * 1.80),
+        category: 'container' as const,
+        specifications: {
+          maxWeightKg: 20,
+          dimensionsCm: { length: 50, width: 35, height: 25 },
+          material: 'Reinforced polypropylene',
+        }
+      },
+      {
+        id: 'sku_fragile_protection',
+        name: 'Fragile Item Protection',
+        description: 'Extra padding and protection for delicate items',
+        costUSD: 8.50,
+        sellPriceUSD: Math.ceil(8.50 * 1.80),
+        category: 'protection' as const,
+        specifications: {
+          maxWeightKg: 50,
+          dimensionsCm: { length: 100, width: 100, height: 100 },
+          material: 'Bubble wrap and foam inserts',
+        }
+      }
+    ];
+
+    for (const pkg of defaultPackaging) {
+      this.packagingSKUs.set(pkg.id, {
+        id: pkg.id,
+        name: pkg.name,
+        description: pkg.description,
+        category: pkg.category,
+        costUSD: pkg.costUSD,
+        sellPriceUSD: pkg.sellPriceUSD,
+        specifications: pkg.specifications,
+        status: 'active',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
   }
 
   /**
