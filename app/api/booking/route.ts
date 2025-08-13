@@ -3,10 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import Stripe from 'stripe';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../convex/_generated/api';
+import { Id } from '../../../convex/_generated/dataModel';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const BookingRequestSchema = z.object({
   quoteId: z.string().min(1, 'Quote ID is required'),
@@ -65,19 +70,30 @@ export async function POST(request: NextRequest) {
     }
 
     if (paymentIntent.status === 'succeeded') {
-      // TODO: Create booking in Convex
-      // const bookingId = await createBooking({
-      //   quoteId: validatedData.quoteId,
-      //   userId,
-      //   pickupDetails: validatedData.pickupDetails,
-      //   paymentIntentId: paymentIntent.id,
-      // });
+      try {
+        // Create booking in Convex with checklist initialization
+        const bookingId = await convex.mutation(api.bookings.createBooking, {
+          quoteId: validatedData.quoteId as Id<"quotes">,
+          userId: userId as Id<"users">,
+          pickupDetails: validatedData.pickupDetails,
+          paymentIntentId: paymentIntent.id,
+        });
 
-      return NextResponse.json({
-        success: true,
-        paymentIntentId: paymentIntent.id,
-        // bookingId,
-      });
+        return NextResponse.json({
+          success: true,
+          paymentIntentId: paymentIntent.id,
+          bookingId,
+          redirectUrl: `/dashboard/booking/${bookingId}`,
+        });
+      } catch (convexError) {
+        console.error('Failed to create booking in Convex:', convexError);
+        // Payment succeeded but booking creation failed - this needs manual intervention
+        return NextResponse.json({
+          success: true,
+          paymentIntentId: paymentIntent.id,
+          warning: 'Payment processed but booking creation failed. Please contact support.',
+        });
+      }
     }
 
     return NextResponse.json({

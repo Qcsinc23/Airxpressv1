@@ -8,7 +8,8 @@ export default defineSchema({
     userId: v.id("users"),
     status: v.union(
       v.literal("NEW"),
-      v.literal("PICKUP_SCHEDULED"),
+      v.literal("NEEDS_DOCS"),
+      v.literal("READY_TO_TENDER"),
       v.literal("TENDERED"),
       v.literal("IN_TRANSIT"),
       v.literal("ARRIVED"),

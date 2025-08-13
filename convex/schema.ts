@@ -10,6 +10,8 @@ import bookings from "./schemas/bookings";
 import content from "./schemas/content";
 import audit from "./schemas/audit";
 import flags from "./schemas/flags";
+import documents from "./schemas/documents";
+import onboarding from "./schemas/onboarding";
 
 // Merge all schemas
 const mergedSchema = {
@@ -21,6 +23,8 @@ const mergedSchema = {
   ...content.tables,
   ...audit.tables,
   ...flags.tables,
+  ...documents.tables,
+  ...onboarding.tables,
 };
 
 export default defineSchema(mergedSchema);
