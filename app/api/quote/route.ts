@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
           storageFee: sellBreakdown.storage,
           surcharge: sellBreakdown.surcharge,
         },
+        packagingDetails: costBreakdown.calculations?.packagingSKUs || [],
         margin: sellBreakdown.margin,
         marginPercentage: sellBreakdown.marginPercentage,
         cutOffTime: '15:00',

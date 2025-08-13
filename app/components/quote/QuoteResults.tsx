@@ -4,6 +4,15 @@
 import { useState } from 'react';
 import { Rate } from '../../types/shipping';
 
+interface PackagingSKU {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  costUSD: number;
+  sellPriceUSD: number;
+}
+
 interface EnhancedRate extends Omit<Rate, 'breakdown'> {
   breakdown: {
     baseRate: number;
@@ -16,6 +25,7 @@ interface EnhancedRate extends Omit<Rate, 'breakdown'> {
     afterHoursFee?: number;
     oversizeFee?: number;
   };
+  packagingDetails?: PackagingSKU[];
   eligibilityWarnings?: string[];
   disclaimers?: string[];
   margin?: number;
@@ -180,9 +190,21 @@ export default function QuoteResults({
                         </div>
                       )}
                       {rate.breakdown.packagingFee && rate.breakdown.packagingFee > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Packaging:</span>
-                          <span className="font-medium">${rate.breakdown.packagingFee.toFixed(2)}</span>
+                        <div className="text-green-600">
+                          <div className="flex justify-between">
+                            <span>Packaging:</span>
+                            <span className="font-medium">${rate.breakdown.packagingFee.toFixed(2)}</span>
+                          </div>
+                          {rate.packagingDetails && rate.packagingDetails.length > 0 && (
+                            <div className="ml-4 mt-1 space-y-1">
+                              {rate.packagingDetails.map((pkg, idx) => (
+                                <div key={idx} className="flex justify-between text-xs">
+                                  <span className="text-green-700">• {pkg.name}</span>
+                                  <span className="text-green-700">${pkg.sellPriceUSD.toFixed(2)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                       {rate.breakdown.storageFee && rate.breakdown.storageFee > 0 && (
