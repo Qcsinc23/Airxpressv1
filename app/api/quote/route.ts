@@ -83,9 +83,7 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Allow public quote generation - authentication not required for quotes
 
     const body = await request.json();
     const validatedData = QuoteRequestSchema.parse(body);
@@ -213,7 +211,7 @@ export async function POST(request: NextRequest) {
         
         // For now, fall back to mock ID if Convex fails but log the error
         console.log('Falling back to mock quote ID due to Convex error');
-        quoteId = `quote_${Date.now()}_${userId.slice(0, 8)}`;
+        quoteId = `quote_${Date.now()}_${userId?.slice(0, 8) || 'anon'}`;
       }
       
       return NextResponse.json({
