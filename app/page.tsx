@@ -1,68 +1,36 @@
 // app/page.tsx
 import Link from 'next/link';
 import Header from './components/ui/Header';
+import HeroSection from './components/ui/HeroSection';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-32 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-      </div>
-
+    <div className="min-h-screen">
       {/* Header */}
       <Header />
 
-      {/* Hero Section */}
-      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-8 shadow-2xl">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Express Air Shipping
-            </span>
-            <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              to the Caribbean
-            </span>
-          </h1>
-          <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Fast, reliable air shipping from New Jersey to Guyana, Trinidad, Jamaica, 
-            Barbados, and Puerto Rico. Same-day pickup, next-day delivery.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link 
-              href="/quote"
-              className="group bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-10 py-4 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform transition-all duration-200 hover:scale-105"
-            >
-              <span className="flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Get Instant Quote
-              </span>
-            </Link>
-            <Link 
-              href="/tracking"
-              className="group bg-white/80 backdrop-blur-lg border border-white/20 hover:bg-white/90 text-gray-900 px-10 py-4 rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transform transition-all duration-200 hover:scale-105"
-            >
-              <span className="flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2 text-indigo-500 group-hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Track Package
-              </span>
-            </Link>
-          </div>
+      {/* Professional Hero Section with Transparency Effects */}
+      <HeroSection
+        title="Express Air Shipping to the Caribbean"
+        subtitle="Fast, reliable air shipping from New Jersey to Guyana, Trinidad, Jamaica, Barbados, and Puerto Rico. Same-day pickup, next-day delivery."
+        ctaText="Get Instant Quote"
+        ctaHref="/quote"
+        backgroundImage="/hero-bg.jpg"
+        heroImage="/hero-transparent.png"
+      />
+
+      {/* Content Container for remaining sections */}
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-32 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="group bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl rounded-2xl p-8 text-center hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,6 +200,12 @@ export default function HomePage() {
                   </svg>
                   Track Shipment
                 </Link></li>
+                <li><Link href="/store" className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center group">
+                  <svg className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Store
+                </Link></li>
                 <li><Link href="/dashboard" className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center group">
                   <svg className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -285,6 +259,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

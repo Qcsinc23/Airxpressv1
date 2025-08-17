@@ -139,14 +139,52 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Booking ID is required' }, { status: 400 });
     }
     
-    // TODO: Implement Convex query to fetch booking
-    // const booking = await getBooking(id);
-    // 
-    // if (!booking || booking.userId !== userId) {
-    //   return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
-    // }
-    
-    return NextResponse.json({ message: 'Booking lookup not implemented yet' }, { status: 501 });
+    try {
+      // Fetch booking from Convex
+      const booking = await convex.query(api.functions.bookings.getBooking, {
+        id: id as Id<"bookings">
+      });
+      
+      if (!booking) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      }
+      
+      // Check if user owns this booking
+      if (booking.userId !== userId) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      }
+      
+      // Also fetch the related quote for complete information
+      let quote = null;
+      try {
+        quote = await convex.query(api.functions.quotes.getQuote, {
+          id: booking.quoteId
+        });
+      } catch (quoteError) {
+        console.warn('Could not fetch related quote:', quoteError);
+      }
+      
+      return NextResponse.json({
+        success: true,
+        booking: {
+          id,
+          status: booking.status,
+          trackingEvents: booking.trackingEvents,
+          pickupDetails: booking.pickupDetails,
+          paymentId: booking.paymentId,
+          createdAt: new Date(booking.createdAt).toISOString(),
+          updatedAt: new Date(booking.updatedAt).toISOString(),
+          quote: quote ? {
+            input: quote.input,
+            computedRates: quote.computedRates
+          } : null
+        }
+      });
+      
+    } catch (convexError) {
+      console.error('Convex query error:', convexError);
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+    }
     
   } catch (error) {
     console.error('Booking GET error:', error);

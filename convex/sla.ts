@@ -2,6 +2,7 @@
 import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { api } from "./_generated/api";
 
 // Create SLA commitment when booking is created
 export const createSlaCommitments = mutation({
@@ -97,23 +98,23 @@ export const markSlaCommitmentMet = mutation({
 // Check for SLA breaches (runs periodically)
 export const checkSlaBreaches = action({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ processedBreaches: number }> => {
     const now = Date.now();
     
     // Get active commitments that are past deadline
-    const overdueCommitments = await ctx.runQuery("sla:getOverdueCommitments", { currentTime: now });
+    const overdueCommitments: any[] = await ctx.runQuery(api.sla.getOverdueCommitments, { currentTime: now });
     
-    const breaches = [];
+    const breaches: any[] = [];
     
     for (const commitment of overdueCommitments) {
       // Check if breach already exists
-      const existingBreach = await ctx.runQuery("sla:getBreachByCommitment", { 
-        commitmentId: commitment._id 
+      const existingBreach = await ctx.runQuery(api.sla.getBreachByCommitment, {
+        commitmentId: commitment._id
       });
       
       if (existingBreach) {
         // Update escalation level if needed
-        await ctx.runMutation("sla:updateBreachEscalation", {
+        await ctx.runMutation(api.sla.updateBreachEscalation, {
           breachId: existingBreach._id,
           currentTime: now,
         });
@@ -124,7 +125,7 @@ export const checkSlaBreaches = action({
       const hoursOverdue = Math.floor((now - commitment.deadline) / (1000 * 60 * 60));
       const severity = getSeverity(hoursOverdue, commitment.type);
       
-      const breachId = await ctx.runMutation("sla:createSlaBreach", {
+      const breachId: any = await ctx.runMutation(api.sla.createSlaBreach, {
         commitment,
         breachedAt: now,
         severity,
@@ -247,16 +248,18 @@ export const getSlaMetrics = query({
 export const getActiveBreaches = query({
   args: {},
   handler: async (ctx) => {
-    const breaches = await ctx.db
+    const allBreaches = await ctx.db
       .query("slaBreaches")
       .withIndex("by_resolved", (q) => q.eq("resolved", false))
       .order("desc")
-      .limit(50)
       .collect();
+    
+    // Take first 50 breaches
+    const breaches = allBreaches.slice(0, 50);
     
     // Get booking details for each breach
     const breachesWithBookings = await Promise.all(
-      breaches.map(async (breach) => {
+      breaches.map(async (breach: any) => {
         const booking = await ctx.db.get(breach.bookingId);
         return { ...breach, booking };
       })

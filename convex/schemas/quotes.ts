@@ -51,5 +51,11 @@ export default defineSchema({
     chosenLaneId: v.optional(v.string()),
     expiry: v.string(),
     createdAt: v.number(),
+    pickupDetails: v.optional(v.object({
+      scheduledTime: v.string(),
+      address: v.string(),
+      contact: v.string(),
+      specialInstructions: v.optional(v.string()),
+    })),
   }).index("byUser", ["userId"]),
 });

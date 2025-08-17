@@ -25,7 +25,8 @@ export async function createPaymentIntent(amount: number, currency: string = 'us
 export async function createCheckoutSession(
   items: { price_data: any; quantity: number }[],
   successUrl: string,
-  cancelUrl: string
+  cancelUrl: string,
+  options: { client_reference_id?: string; metadata?: Record<string, string> } = {}
 ) {
   try {
     const session = await stripe.checkout.sessions.create({
@@ -34,6 +35,7 @@ export async function createCheckoutSession(
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
+      ...options,
     });
     
     return session;

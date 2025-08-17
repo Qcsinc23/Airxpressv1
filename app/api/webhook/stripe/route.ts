@@ -2,6 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
@@ -31,24 +36,33 @@ export async function POST(request: NextRequest) {
     console.log('Stripe webhook event:', event.type);
 
     switch (event.type) {
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment succeeded:', paymentIntent.id);
-        
-        // TODO: Update booking status in Convex
-        // const quoteId = paymentIntent.metadata.quoteId;
-        // const userId = paymentIntent.metadata.userId;
-        // 
-        // await updateBookingStatus({
-        //   bookingId: bookingId,
-        //   status: 'PAYMENT_CONFIRMED',
-        //   trackingEvent: {
-        //     timestamp: new Date().toISOString(),
-        //     status: 'PAYMENT_CONFIRMED',
-        //     notes: `Payment of $${paymentIntent.amount / 100} confirmed`
-        //   }
-        // });
-        
+      case 'checkout.session.completed':
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log('Checkout session completed:', session.id);
+
+        const { quoteId, userId } = session.metadata!;
+
+        // Fetch the quote to get pickup details
+        const quote = await convex.query(api.functions.quotes.getQuote, { id: quoteId as Id<'quotes'> });
+
+        if (!quote) {
+          console.error('Quote not found for quoteId:', quoteId);
+          break;
+        }
+
+        if (!quote.pickupDetails) {
+          console.error('Pickup details not found for quoteId:', quoteId);
+          break;
+        }
+
+        // Create booking in Convex
+        await convex.mutation(api.functions.bookings.createBooking, {
+          quoteId: quoteId as Id<'quotes'>,
+          userId: userId as Id<'users'>,
+          pickupDetails: quote.pickupDetails,
+          paymentIntentId: session.payment_intent as string,
+        });
+
         break;
 
       case 'payment_intent.payment_failed':

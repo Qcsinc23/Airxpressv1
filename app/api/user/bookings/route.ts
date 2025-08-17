@@ -1,6 +1,11 @@
 // app/api/user/bookings/route.ts
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET() {
   try {
@@ -10,40 +15,67 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // TODO: Implement Convex query to fetch user bookings
-    // const bookings = await getUserBookings(userId);
-    
-    // Mock data for now
-    const mockBookings = [
-      {
-        id: 'booking-1',
-        trackingNumber: 'AX-TRK-001',
-        status: 'IN_TRANSIT',
-        carrier: 'Caribbean Airlines',
-        route: 'JFK → GEO',
-        totalPrice: 150.00,
-        createdAt: '2024-08-09T10:00:00Z',
-      },
-      {
-        id: 'booking-2', 
-        trackingNumber: 'AX-TRK-002',
-        status: 'DELIVERED',
-        carrier: 'Delta Cargo',
-        route: 'JFK → KIN',
-        totalPrice: 125.00,
-        createdAt: '2024-08-08T14:30:00Z',
-      },
-    ];
+    try {
+      // Fetch user bookings from Convex
+      const bookings = await convex.query(api.functions.bookings.getBookingsByUser, {
+        userId: userId as Id<"users">
+      });
 
-    return NextResponse.json({
-      success: true,
-      bookings: mockBookings,
-    });
+      // Transform bookings to match expected API format
+      const formattedBookings = await Promise.all(
+        bookings.map(async (booking: any) => {
+          // Try to get the related quote for pricing information
+          let quote = null;
+          let totalPrice = 0;
+          let carrier = 'Unknown Carrier';
+          let route = 'Unknown Route';
+
+          try {
+            quote = await convex.query(api.functions.quotes.getQuote, {
+              id: booking.quoteId
+            });
+            
+            if (quote && quote.computedRates && quote.computedRates.length > 0) {
+              totalPrice = quote.computedRates[0].totalPrice;
+              carrier = quote.computedRates[0].carrier;
+              route = `${quote.computedRates[0].departureAirport} → ${quote.computedRates[0].arrivalAirport}`;
+            }
+          } catch (quoteError) {
+            console.warn('Could not fetch quote for booking:', booking._id, quoteError);
+          }
+
+          return {
+            id: booking._id,
+            trackingNumber: `AX-TRK-${booking._id.slice(-6).toUpperCase()}`,
+            status: booking.status,
+            carrier,
+            route,
+            totalPrice,
+            createdAt: new Date(booking.createdAt).toISOString(),
+            pickupDetails: booking.pickupDetails,
+            trackingEvents: booking.trackingEvents,
+          };
+        })
+      );
+
+      return NextResponse.json({
+        success: true,
+        bookings: formattedBookings,
+      });
+
+    } catch (convexError) {
+      console.error('Convex query error:', convexError);
+      // Return empty array if query fails but user is authenticated
+      return NextResponse.json({
+        success: true,
+        bookings: [],
+      });
+    }
 
   } catch (error) {
     console.error('User bookings API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

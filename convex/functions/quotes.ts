@@ -84,3 +84,21 @@ export const getQuotesByUser = query({
     return await ctx.db.query("quotes").withIndex("byUser", q => q.eq("userId", args.userId)).collect();
   },
 });
+
+// Add pickup details to a quote
+export const addPickupDetailsToQuote = mutation({
+  args: {
+    quoteId: v.id("quotes"),
+    pickupDetails: v.object({
+      scheduledTime: v.string(),
+      address: v.string(),
+      contact: v.string(),
+      specialInstructions: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.quoteId, {
+      pickupDetails: args.pickupDetails,
+    });
+  },
+});

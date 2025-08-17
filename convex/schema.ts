@@ -12,6 +12,7 @@ import audit from "./schemas/audit";
 import flags from "./schemas/flags";
 import documents from "./schemas/documents";
 import onboarding from "./schemas/onboarding";
+import store from "./schemas/store";
 import { agentsSchema } from "./schemas/agents";
 import { slaSchema } from "./schemas/sla";
 
@@ -27,6 +28,7 @@ const mergedSchema = {
   ...flags.tables,
   ...documents.tables,
   ...onboarding.tables,
+  ...store.tables,
   ...agentsSchema,
   ...slaSchema,
 };

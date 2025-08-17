@@ -1,6 +1,7 @@
 // convex/bookings.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 export const createBooking = mutation({
   args: {
@@ -34,14 +35,14 @@ export const createBooking = mutation({
     });
 
     // Initialize the onboarding checklist
-    await ctx.runMutation("onboarding:initializeBookingChecklist", {
+    await ctx.runMutation(api.onboarding.initializeBookingChecklist, {
       userId: args.userId,
       bookingId: bookingId,
     });
 
     // Create SLA commitments for this booking
     try {
-      await ctx.runMutation("sla:createSlaCommitments", {
+      await ctx.runMutation(api.sla.createSlaCommitments, {
         bookingId: bookingId,
       });
     } catch (error) {
@@ -52,7 +53,7 @@ export const createBooking = mutation({
     // Auto-assign agent if requested and agents are available
     if (args.autoAssignAgent) {
       try {
-        await ctx.runMutation("agents:autoAssignBooking", {
+        await ctx.runMutation(api.agents.autoAssignBooking, {
           bookingId: bookingId,
           assignedBy: args.userId, // System assignment
           priority: "normal",
@@ -137,14 +138,14 @@ export const getUserBookings = query({
 
 export const getBookingWithProgress = query({
   args: { bookingId: v.id("bookings") },
-  handler: async (ctx, { bookingId }) => {
+  handler: async (ctx, { bookingId }): Promise<any> => {
     const booking = await ctx.db.get(bookingId);
     if (!booking) {
       return null;
     }
 
     // Get progress information
-    const progress = await ctx.runQuery("onboarding:getBookingProgress", {
+    const progress = await ctx.runQuery(api.onboarding.getBookingProgress, {
       bookingId: bookingId,
     });
 
@@ -157,7 +158,7 @@ export const getBookingWithProgress = query({
 
 export const getOpsBookings = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<any[]> => {
     // Get all bookings for ops dashboard
     const bookings = await ctx.db
       .query("bookings")
@@ -167,9 +168,9 @@ export const getOpsBookings = query({
 
     // Get progress and agent assignment for each booking
     const bookingsWithDetails = await Promise.all(
-      bookings.map(async (booking) => {
+      bookings.map(async (booking): Promise<any> => {
         // Get progress
-        const progress = await ctx.runQuery("onboarding:getBookingProgress", {
+        const progress = await ctx.runQuery(api.onboarding.getBookingProgress, {
           bookingId: booking._id,
         });
         

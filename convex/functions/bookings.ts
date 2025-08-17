@@ -106,3 +106,34 @@ export const getBookingsByStatus = query({
     return await ctx.db.query("bookings").withIndex("byStatus", q => q.eq("status", args.status)).collect();
   },
 });
+
+// Get bookings by user
+export const getBookingsByUser = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("bookings").withIndex("byUser", q => q.eq("userId", args.userId)).collect();
+  },
+});
+
+// Get booking by tracking number (searching all bookings)
+export const getBookingByTrackingNumber = query({
+  args: {
+    trackingNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Since tracking numbers are generated from booking IDs, we need to search for the booking
+    // Format: AX-TRK-{LAST_6_CHARS_OF_ID}
+    const trackingId = args.trackingNumber.replace('AX-TRK-', '').toLowerCase();
+    
+    // Get all bookings and find one that matches the tracking pattern
+    const allBookings = await ctx.db.query("bookings").collect();
+    
+    const matchedBooking = allBookings.find(booking =>
+      booking._id.slice(-6).toLowerCase() === trackingId
+    );
+    
+    return matchedBooking;
+  },
+});
