@@ -237,7 +237,7 @@ export default function EnhancedQuoteForm({
               >
                 <RadioGroup
                   name="serviceLevel"
-                  value={watchedValues.serviceLevel || ''}
+                  value={serviceLevel || ''}
                   options={SERVICE_LEVELS}
                   onChange={(value) => form.setValue('serviceLevel', value as any)}
                   error={!!getFieldError('serviceLevel')}
