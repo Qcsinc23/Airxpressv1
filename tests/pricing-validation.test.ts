@@ -17,6 +17,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [
           {
             type: 'box',
@@ -42,6 +43,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [
           {
             type: 'box',
@@ -62,6 +64,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [
           {
             type: 'box',
@@ -82,6 +85,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [
           {
             type: 'box',
@@ -104,6 +108,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [{ type: 'box', weightKg: 28 }]
       };
 
@@ -119,6 +124,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [{ type: 'box', weightKg: 28 }]
       };
 
@@ -137,6 +143,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [{ type: 'box', weightKg: 34 }]
       };
 
@@ -160,6 +167,7 @@ describe('Pricing Engine Validation', () => {
       const input: CostCalculationInput = {
         origin: 'JFK',
         destination: 'GEO',
+        serviceLevel: 'STANDARD',
         pieces: [{ type: 'box', weightKg: 1 }]
       };
 
@@ -181,6 +189,7 @@ describe('Pricing Engine Validation', () => {
         const input: CostCalculationInput = {
           origin: 'JFK',
           destination: 'GEO',
+          serviceLevel: 'STANDARD',
           pieces: [{ type: 'box', weightKg: weights[i] }]
         };
 

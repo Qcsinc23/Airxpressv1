@@ -3,6 +3,6 @@ import { internalMutation, mutation, query } from "../_generated/server";
 
 // Export all functions
 export { createQuote, getQuote, getQuotesByUser } from "./quotes";
-export { createBooking, updateBookingStatus, getBooking, getBookingsByStatus } from "./bookings";
+export { createBooking, updateBookingStatus, getBooking, getBookingsByStatus, getOpsBookings } from "./bookings";
 export { getActiveLanes, getLanesByOD } from "./lanes";
 export { getContentByTypeAndSlug, getContentByType } from "./content";

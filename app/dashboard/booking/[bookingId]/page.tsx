@@ -16,20 +16,30 @@ interface BookingDetailProps {
 export default function BookingDetailPage({ params }: BookingDetailProps) {
   const { user } = useUser();
   
-  // Get booking data with progress
+  // Get booking data using available function
   const bookingData = useQuery(
-    api.bookings.getBookingWithProgress,
-    { bookingId: params.bookingId as Id<"bookings"> }
+    api.functions.bookings.getBooking,
+    { id: params.bookingId as Id<"bookings"> }
   );
 
-  // Get review state for this booking
-  const reviewState = useQuery(
-    api.onboarding.getReviewState,
-    user && bookingData ? {
-      userId: user.id as Id<"users">,
-      bookingId: params.bookingId,
-    } : "skip"
-  );
+  // TODO: Implement review state functionality when onboarding functions are available
+  // Placeholder review state
+  const reviewState = bookingData ? {
+    checklist: [
+      {
+        _id: '1',
+        key: 'complete-invoice',
+        label: 'Complete Shipping Invoice',
+        done: false
+      },
+      {
+        _id: '2',
+        key: 'upload-documents',
+        label: 'Upload Required Documents',
+        done: false
+      }
+    ]
+  } : null;
 
   if (!user) {
     return (
@@ -82,7 +92,12 @@ export default function BookingDetailPage({ params }: BookingDetailProps) {
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Completion</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {bookingData.progress?.progressPercentage || 0}%
+                    {bookingData.status === 'NEW' ? 10 :
+                     bookingData.status === 'NEEDS_DOCS' ? 25 :
+                     bookingData.status === 'READY_TO_TENDER' ? 50 :
+                     bookingData.status === 'TENDERED' ? 70 :
+                     bookingData.status === 'IN_TRANSIT' ? 85 :
+                     bookingData.status === 'ARRIVED' ? 95 : 100}%
                   </p>
                 </div>
               </div>
@@ -90,7 +105,12 @@ export default function BookingDetailPage({ params }: BookingDetailProps) {
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
                   className="bg-blue-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${bookingData.progress?.progressPercentage || 0}%` }}
+                  style={{ width: `${bookingData.status === 'NEW' ? 10 :
+                                     bookingData.status === 'NEEDS_DOCS' ? 25 :
+                                     bookingData.status === 'READY_TO_TENDER' ? 50 :
+                                     bookingData.status === 'TENDERED' ? 70 :
+                                     bookingData.status === 'IN_TRANSIT' ? 85 :
+                                     bookingData.status === 'ARRIVED' ? 95 : 100}%` }}
                 ></div>
               </div>
             </div>

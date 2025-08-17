@@ -48,9 +48,7 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Allow public quote generation - authentication not required for quotes
 
     const body = await request.json();
     const validatedData = QuoteRequestSchema.parse(body);
@@ -128,7 +126,7 @@ export async function POST(request: NextRequest) {
       };
       
       // TODO: Save quote to Convex database with pricing snapshots
-      const quoteId = `quote_${Date.now()}_${userId.slice(0, 8)}`;
+      const quoteId = `quote_${Date.now()}_${userId?.slice(0, 8) || 'anon'}`;
       
       return NextResponse.json({
         success: true,

@@ -69,7 +69,11 @@ export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const saveInvoice = useMutation(api.onboarding.saveShippingInvoice);
+  // TODO: Implement invoice saving functionality when onboarding functions are available
+  const saveInvoice = async (args: any) => {
+    console.warn('Invoice saving not implemented - onboarding functions not available');
+    throw new Error('Invoice saving functionality is not yet implemented');
+  };
 
   // Calculate cubic feet automatically
   const calculateCubicFeet = (item: any) => {
@@ -98,7 +102,7 @@ export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
     setFormData(prev => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof typeof prev],
+        ...(prev[section as keyof typeof prev] as any),
         [field]: value,
       }
     }));

@@ -27,8 +27,8 @@ export default function OpsPage() {
   const [selectedColumn, setSelectedColumn] = useState<string>('all');
   
   // Get all bookings for ops dashboard
-  const allBookings = useQuery(api.bookings.getOpsBookings) || [];
-  const updateBookingStatus = useMutation(api.bookings.updateBookingStatus);
+  const allBookings = useQuery(api.functions.bookings.getOpsBookings) || [];
+  const updateBookingStatus = useMutation(api.functions.bookings.updateBookingStatus);
 
   // Check if user has ops/admin role
   const hasOpsAccess = user?.publicMetadata?.role === 'ops' || user?.publicMetadata?.role === 'admin';
@@ -69,7 +69,11 @@ export default function OpsPage() {
       await updateBookingStatus({
         bookingId,
         status: newStatus as any,
-        notes: `Status changed to ${newStatus} by ${user?.fullName || 'Ops'}`,
+        trackingEvent: {
+          timestamp: new Date().toISOString(),
+          status: `STATUS_CHANGED_TO_${newStatus}`,
+          notes: `Status changed to ${newStatus} by ${user?.fullName || 'Ops'}`,
+        }
       });
     } catch (error) {
       console.error('Failed to update status:', error);

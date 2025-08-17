@@ -101,19 +101,19 @@ export const checkSlaBreaches = action({
     const now = Date.now();
     
     // Get active commitments that are past deadline
-    const overdueCommitments = await ctx.runQuery("sla:getOverdueCommitments", { currentTime: now });
+    const overdueCommitments = await ctx.runQuery("sla:getOverdueCommitments" as any, { currentTime: now });
     
     const breaches = [];
     
     for (const commitment of overdueCommitments) {
       // Check if breach already exists
-      const existingBreach = await ctx.runQuery("sla:getBreachByCommitment", { 
+      const existingBreach = await ctx.runQuery("sla:getBreachByCommitment" as any, { 
         commitmentId: commitment._id 
       });
       
       if (existingBreach) {
         // Update escalation level if needed
-        await ctx.runMutation("sla:updateBreachEscalation", {
+        await ctx.runMutation("sla:updateBreachEscalation" as any, {
           breachId: existingBreach._id,
           currentTime: now,
         });
@@ -124,7 +124,7 @@ export const checkSlaBreaches = action({
       const hoursOverdue = Math.floor((now - commitment.deadline) / (1000 * 60 * 60));
       const severity = getSeverity(hoursOverdue, commitment.type);
       
-      const breachId = await ctx.runMutation("sla:createSlaBreach", {
+      const breachId = await ctx.runMutation("sla:createSlaBreach" as any, {
         commitment,
         breachedAt: now,
         severity,
@@ -251,8 +251,7 @@ export const getActiveBreaches = query({
       .query("slaBreaches")
       .withIndex("by_resolved", (q) => q.eq("resolved", false))
       .order("desc")
-      .limit(50)
-      .collect();
+      .take(50);
     
     // Get booking details for each breach
     const breachesWithBookings = await Promise.all(

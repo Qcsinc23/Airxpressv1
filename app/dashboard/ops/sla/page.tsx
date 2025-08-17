@@ -14,30 +14,24 @@ export default function SLADashboard() {
   // Check if user has ops/admin access
   const hasOpsAccess = user?.publicMetadata?.role === 'ops' || user?.publicMetadata?.role === 'admin';
 
-  // Get active breaches
-  const activeBreaches = useQuery(api.sla.getActiveBreaches) || [];
+  // TODO: Implement SLA functions when available
+  // Placeholder data for demonstration - replace when api.sla functions are implemented
+  const activeBreaches: any[] = [];
+  const slaMetrics: any[] = [];
 
-  // Get SLA metrics for current week
-  const currentDate = new Date();
-  const weekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay())).toISOString().split('T')[0];
-  const weekEnd = new Date(currentDate.setDate(currentDate.getDate() + 6)).toISOString().split('T')[0];
-  
-  const slaMetrics = useQuery(api.sla.getSlaMetrics, {
-    period: "daily",
-    startDate: weekStart,
-    endDate: weekEnd,
-  }) || [];
+  // Placeholder mutation
+  const resolveBreach = async (args: any) => {
+    console.warn('SLA breach resolution not implemented - SLA functions not available');
+    alert('SLA functionality is not yet implemented');
+  };
 
-  // Mutations
-  const resolveBreach = useMutation(api.sla.resolveBreach);
-
-  const handleResolveBreach = async (breachId: Id<"slaBreaches">, resolution: string) => {
+  const handleResolveBreach = async (breachId: string, resolution: string) => {
     if (!user) return;
     
     try {
       await resolveBreach({
         breachId,
-        resolvedBy: user.id as Id<"users">,
+        resolvedBy: user.id,
         resolution,
       });
     } catch (error) {

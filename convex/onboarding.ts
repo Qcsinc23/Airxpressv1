@@ -55,7 +55,7 @@ export const initializeBookingChecklist = mutation({
 
     const checklistIds = [];
     for (const item of defaultChecklist) {
-      const checklistId = await ctx.runMutation("onboarding:upsertChecklist", {
+      const checklistId = await ctx.runMutation("onboarding:upsertChecklist" as any, {
         userId,
         bookingId,
         key: item.key,
@@ -83,7 +83,7 @@ export const saveAcknowledgement = mutation({
     const ackId = await ctx.db.insert("acknowledgements", args);
     
     // Mark checklist item as done
-    await ctx.runMutation("onboarding:upsertChecklist", {
+    await ctx.runMutation("onboarding:upsertChecklist" as any, {
       userId: args.userId,
       bookingId: args.bookingId,
       key: "acknowledge-disclaimer",
@@ -123,7 +123,7 @@ export const saveShippingInvoice = mutation({
     }
 
     // Mark checklist item as done
-    await ctx.runMutation("onboarding:upsertChecklist", {
+    await ctx.runMutation("onboarding:upsertChecklist" as any, {
       userId: invoice.userId,
       bookingId: invoice.bookingId,
       key: "complete-invoice",

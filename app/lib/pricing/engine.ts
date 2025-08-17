@@ -31,7 +31,6 @@ export class PricingEngine {
         name: 'Plastic Barrel - 45L',
         description: 'Heavy duty plastic barrel for general cargo',
         costUSD: 12.50,
-        sellPriceUSD: Math.ceil(12.50 * 1.80),
         category: 'barrel' as const,
         specifications: {
           maxWeightKg: 30,
@@ -44,7 +43,6 @@ export class PricingEngine {
         name: 'Fiber Barrel - 60L',
         description: 'Eco-friendly fiber barrel for food items',
         costUSD: 15.75,
-        sellPriceUSD: Math.ceil(15.75 * 1.80),
         category: 'barrel' as const,
         specifications: {
           maxWeightKg: 35,
@@ -57,7 +55,6 @@ export class PricingEngine {
         name: 'E-Container Small',
         description: 'Reusable container for multiple shipments',
         costUSD: 25.00,
-        sellPriceUSD: Math.ceil(25.00 * 1.80),
         category: 'container' as const,
         specifications: {
           maxWeightKg: 40,
@@ -70,7 +67,6 @@ export class PricingEngine {
         name: 'Mini E-Container',
         description: 'Compact container for small items',
         costUSD: 18.00,
-        sellPriceUSD: Math.ceil(18.00 * 1.80),
         category: 'container' as const,
         specifications: {
           maxWeightKg: 20,
@@ -83,7 +79,6 @@ export class PricingEngine {
         name: 'Fragile Item Protection',
         description: 'Extra padding and protection for delicate items',
         costUSD: 8.50,
-        sellPriceUSD: Math.ceil(8.50 * 1.80),
         category: 'protection' as const,
         specifications: {
           maxWeightKg: 50,
@@ -96,13 +91,13 @@ export class PricingEngine {
     for (const pkg of defaultPackaging) {
       this.packagingSKUs.set(pkg.id, {
         id: pkg.id,
+        code: pkg.id,
         name: pkg.name,
         description: pkg.description,
         category: pkg.category,
         costUSD: pkg.costUSD,
-        sellPriceUSD: pkg.sellPriceUSD,
         specifications: pkg.specifications,
-        status: 'active',
+        isActive: true,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -313,7 +308,7 @@ export class PricingEngine {
     return {
       id: 'cal-general-air-us-gy-2024',
       carrier: 'Caribbean Airlines',
-      product: 'General Air',
+      product: 'GeneralAir',
       origin: 'JFK',
       destination: 'GEO',
       region: 'Guyana',

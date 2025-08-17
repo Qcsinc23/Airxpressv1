@@ -18,14 +18,38 @@ export default function ReviewPage() {
     { id: 'BOOK_2024_002', destination: 'Port of Spain, Trinidad', status: 'NEEDS_DOCS', createdAt: '2024-01-10' },
   ];
 
-  // Get review state for selected booking
-  const reviewState = useQuery(
-    api.onboarding.getReviewState,
-    selectedBookingId && user ? {
-      userId: user.id as Id<"users">,
-      bookingId: selectedBookingId,
-    } : "skip"
-  );
+  // TODO: Implement review state functionality when onboarding functions are available
+  // Placeholder review state
+  const reviewState = selectedBookingId ? {
+    checklist: [
+      {
+        _id: '1',
+        key: 'upload-commercial-invoice',
+        label: 'Upload Commercial Invoice',
+        done: false
+      },
+      {
+        _id: '2',
+        key: 'upload-packing-list',
+        label: 'Upload Packing List',
+        done: false
+      },
+      {
+        _id: '3',
+        key: 'upload-photo-id',
+        label: 'Upload Photo ID',
+        done: false
+      }
+    ],
+    progress: {
+      progressPercentage: 0,
+      percentage: 0,
+      completed: 0,
+      total: 3,
+      missingDocs: []
+    },
+    documents: []
+  } : null;
 
   // Default to first booking if none selected
   useEffect(() => {

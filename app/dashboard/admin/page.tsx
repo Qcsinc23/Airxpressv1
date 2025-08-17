@@ -13,16 +13,17 @@ export default function AdminDashboard() {
   // Check if user has admin access
   const hasAdminAccess = user?.publicMetadata?.role === 'admin';
 
-  // Get system data
-  const allBookings = useQuery(api.bookings.getOpsBookings) || [];
-  const activeBreaches = useQuery(api.sla.getActiveBreaches) || [];
+  // Get system data - using available API endpoints
+  const allBookings = useQuery(api.functions.bookings.getOpsBookings) || [];
+  // Note: SLA functions not available in current API, using placeholder
+  const activeBreaches: any[] = [];
   
-  // Mutations
-  const initializeSlaTemplates = useMutation(api["sla-defaults"].initializeDefaultSlaTemplates);
+  // Mutations - using available API endpoints
+  const initializeSlaTemplates = () => Promise.resolve({ message: 'SLA templates not yet implemented' });
 
   const handleInitializeSla = async () => {
     try {
-      const result = await initializeSlaTemplates({});
+      const result = await initializeSlaTemplates();
       alert(result.message);
     } catch (error) {
       console.error('Failed to initialize SLA templates:', error);

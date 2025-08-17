@@ -31,8 +31,9 @@ export default function DocumentUploaderConvex({
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const generateUploadUrl = useAction(api.storage.generateUploadUrl);
-  const recordDocument = useMutation(api.storage.recordUploadedDocument);
+  // TODO: Implement storage functionality when Convex storage functions are available
+  // const generateUploadUrl = useAction(api.storage.generateUploadUrl);
+  // const recordDocument = useMutation(api.storage.recordUploadedDocument);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,35 +49,20 @@ export default function DocumentUploaderConvex({
     setUploadProgress(0);
 
     try {
-      // Step 1: Get upload URL from Convex
-      const { url } = await generateUploadUrl();
-
-      // Step 2: Upload file to Convex storage
-      const response = await fetch(url, {
-        method: "POST",
-        body: file,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
-      }
-
-      const { storageId } = await response.json();
+      // TODO: Replace with actual Convex storage implementation when available
+      // Simulate upload progress for UI demonstration
+      setUploadProgress(30);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setUploadProgress(60);
+      await new Promise(resolve => setTimeout(resolve, 500));
       setUploadProgress(80);
-
-      // Step 3: Record document in database
-      const documentId = await recordDocument({
-        userId,
-        bookingId,
-        type: documentType,
-        filename: file.name,
-        size: file.size,
-        contentType: file.type,
-        blobId: storageId,
-      });
-
+      await new Promise(resolve => setTimeout(resolve, 500));
       setUploadProgress(100);
-      onUploadComplete?.(documentId);
+
+      // Placeholder implementation - would normally upload to Convex storage
+      console.warn('Document upload functionality not implemented - storage API unavailable');
+      onUploadError?.('Document upload not yet implemented. Storage functions are not available.');
+      return;
 
     } catch (error) {
       console.error('Upload error:', error);

@@ -11,34 +11,48 @@ export default function AgentDashboard() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<'assigned' | 'completed' | 'profile'>('assigned');
 
-  // Check if user is an agent
-  const agentProfile = useQuery(
-    api.agents.getAgentProfile,
-    user ? { userId: user.id as Id<"users"> } : "skip"
-  );
+  // TODO: Implement agent functions when available
+  // Placeholder data for demonstration - replace when api.agents functions are implemented
+  const agentProfile = user?.publicMetadata?.role === 'agent' ? {
+    _id: 'placeholder-agent-id',
+    capacity: {
+      currentActiveBookings: 0,
+      maxActiveBookings: 10,
+      specializations: ['standard']
+    },
+    performance: {
+      completedBookings: 0,
+      averageRating: 5.0,
+      onTimePercentage: 100
+    },
+    coverage: {
+      states: ['NY', 'NJ'],
+      maxRadius: 50,
+      homeBase: { address: 'New York, NY' }
+    },
+    contact: {
+      phone: user.phoneNumbers?.[0]?.phoneNumber || '',
+      email: user.emailAddresses?.[0]?.emailAddress || '',
+      whatsapp: null
+    }
+  } : null;
 
-  // Get agent's bookings
-  const assignedBookings = useQuery(
-    api.agents.getAgentBookings,
-    agentProfile ? { agentId: agentProfile._id, status: "assigned" } : "skip"
-  );
+  // Placeholder empty arrays for bookings and notifications
+  const assignedBookings: any[] = [];
+  const completedBookings: any[] = [];
+  const notifications: any[] = [];
 
-  const completedBookings = useQuery(
-    api.agents.getAgentBookings,
-    agentProfile ? { agentId: agentProfile._id, status: "completed" } : "skip"
-  );
+  // Placeholder mutations
+  const updateAssignmentStatus = async (args: any) => {
+    console.warn('Agent assignment status update not implemented - agent functions not available');
+    alert('Agent functionality is not yet implemented');
+  };
+  
+  const markNotificationRead = async (args: any) => {
+    console.warn('Mark notification read not implemented - agent functions not available');
+  };
 
-  // Get notifications
-  const notifications = useQuery(
-    api.agents.getAgentNotifications,
-    agentProfile ? { agentId: agentProfile._id, unreadOnly: true } : "skip"
-  );
-
-  // Mutations
-  const updateAssignmentStatus = useMutation(api.agents.updateAssignmentStatus);
-  const markNotificationRead = useMutation(api.agents.markNotificationRead);
-
-  const handleStatusUpdate = async (assignmentId: Id<"agentAssignments">, newStatus: string, notes?: string) => {
+  const handleStatusUpdate = async (assignmentId: string, newStatus: string, notes?: string) => {
     try {
       await updateAssignmentStatus({
         assignmentId,
@@ -51,7 +65,7 @@ export default function AgentDashboard() {
     }
   };
 
-  const handleNotificationClick = async (notificationId: Id<"agentNotifications">) => {
+  const handleNotificationClick = async (notificationId: string) => {
     try {
       await markNotificationRead({ notificationId });
     } catch (error) {

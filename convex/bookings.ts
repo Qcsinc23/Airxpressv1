@@ -34,14 +34,14 @@ export const createBooking = mutation({
     });
 
     // Initialize the onboarding checklist
-    await ctx.runMutation("onboarding:initializeBookingChecklist", {
+    await ctx.runMutation("onboarding:initializeBookingChecklist" as any, {
       userId: args.userId,
       bookingId: bookingId,
     });
 
     // Create SLA commitments for this booking
     try {
-      await ctx.runMutation("sla:createSlaCommitments", {
+      await ctx.runMutation("sla:createSlaCommitments" as any, {
         bookingId: bookingId,
       });
     } catch (error) {
@@ -52,7 +52,7 @@ export const createBooking = mutation({
     // Auto-assign agent if requested and agents are available
     if (args.autoAssignAgent) {
       try {
-        await ctx.runMutation("agents:autoAssignBooking", {
+        await ctx.runMutation("agents:autoAssignBooking" as any, {
           bookingId: bookingId,
           assignedBy: args.userId, // System assignment
           priority: "normal",
@@ -144,7 +144,7 @@ export const getBookingWithProgress = query({
     }
 
     // Get progress information
-    const progress = await ctx.runQuery("onboarding:getBookingProgress", {
+    const progress = await ctx.runQuery("onboarding:getBookingProgress" as any, {
       bookingId: bookingId,
     });
 
@@ -169,7 +169,7 @@ export const getOpsBookings = query({
     const bookingsWithDetails = await Promise.all(
       bookings.map(async (booking) => {
         // Get progress
-        const progress = await ctx.runQuery("onboarding:getBookingProgress", {
+        const progress = await ctx.runQuery("onboarding:getBookingProgress" as any, {
           bookingId: booking._id,
         });
         

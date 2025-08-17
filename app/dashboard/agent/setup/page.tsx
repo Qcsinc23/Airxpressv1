@@ -45,7 +45,11 @@ export default function AgentSetupPage() {
   const [saving, setSaving] = useState(false);
   const [zipCodeInput, setZipCodeInput] = useState('');
 
-  const createAgentProfile = useMutation(api.agents.createAgentProfile);
+  // TODO: Implement agent profile creation when agent functions are available
+  const createAgentProfile = async (args: any) => {
+    console.warn('Agent profile creation not implemented - agent functions not available');
+    throw new Error('Agent profile creation functionality is not yet implemented');
+  };
 
   const stateOptions = [
     'NJ', 'NY', 'CT', 'PA', 'DE', 'MD', 'MA', 'RI', 'VT', 'NH', 'ME'
