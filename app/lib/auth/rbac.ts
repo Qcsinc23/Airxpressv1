@@ -1,12 +1,17 @@
 // app/lib/auth/rbac.ts
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
+import { auth, useUser } from '@clerk/nextjs/server';
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
+import { ConvexHttpClient } from 'convex/browser';
+import { Id } from '../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
+  CUSTOMER = 'customer',
+  AGENT = 'agent',
   OPS = 'ops',
-  SUPPORT = 'support',
+  ADMIN = 'admin',
 }
 
 export enum Permission {
@@ -36,24 +41,23 @@ export enum Permission {
 }
 
 // Define base permissions for each role
-const userPermissions = [
+const customerPermissions = [
   Permission.CREATE_QUOTE,
   Permission.VIEW_OWN_BOOKINGS,
   Permission.TRACK_SHIPMENT,
   Permission.UPLOAD_DOCUMENTS,
 ];
 
-const supportPermissions = [
+const agentPermissions = [
+  ...customerPermissions,
   Permission.VIEW_CUSTOMER_DATA,
   Permission.MODIFY_BOOKINGS,
   Permission.ACCESS_SUPPORT_TOOLS,
-  Permission.TRACK_SHIPMENT,
   Permission.VIEW_ALL_BOOKINGS,
 ];
 
 const opsPermissions = [
-  ...userPermissions,
-  Permission.VIEW_ALL_BOOKINGS,
+  ...agentPermissions,
   Permission.UPDATE_BOOKING_STATUS,
   Permission.VIEW_OPERATIONS_DASHBOARD,
   Permission.MANAGE_DISPATCH,
@@ -63,9 +67,9 @@ const adminPermissions = Object.values(Permission);
 
 // Define role-permission mappings
 const rolePermissions: Record<Role, Permission[]> = {
-  [Role.USER]: userPermissions,
+  [Role.CUSTOMER]: customerPermissions,
+  [Role.AGENT]: agentPermissions,
   [Role.OPS]: opsPermissions,
-  [Role.SUPPORT]: supportPermissions,
   [Role.ADMIN]: adminPermissions,
 };
 
@@ -74,19 +78,41 @@ export interface UserWithRole {
   email: string;
   role: Role;
   permissions: Permission[];
+  convexUserId?: Id<'users'>;
 }
 
 export async function getCurrentUser(): Promise<UserWithRole | null> {
   try {
-    const { userId, user } = auth();
+    const { userId, user } = await auth();
     
     if (!userId || !user) {
       return null;
     }
 
-    // Get user role from Clerk metadata or default to USER
-    const userRole = (user.publicMetadata?.role as Role) || Role.USER;
-    const permissions = rolePermissions[userRole] || rolePermissions[Role.USER];
+    // Get user from Convex database
+    try {
+      const convexUser = await convex.query(api.functions.users.getUserByClerkId, {
+        clerkId: userId
+      });
+
+      if (convexUser) {
+        const permissions = rolePermissions[convexUser.role] || rolePermissions[Role.CUSTOMER];
+
+        return {
+          id: userId,
+          email: convexUser.email,
+          role: convexUser.role,
+          permissions,
+          convexUserId: convexUser._id,
+        };
+      }
+    } catch (convexError) {
+      console.warn('Could not fetch user from Convex:', convexError);
+    }
+
+    // Fallback to Clerk data with default role
+    const userRole = (user.publicMetadata?.role as Role) || Role.CUSTOMER;
+    const permissions = rolePermissions[userRole] || rolePermissions[Role.CUSTOMER];
 
     return {
       id: userId,

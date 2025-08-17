@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PricingEngine } from '../../lib/pricing/engine';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../convex/_generated/api';
+import { Id } from '../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const QuoteRequestSchema = z.object({
   originZip: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
@@ -35,8 +40,38 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Quote ID is required' }, { status: 400 });
     }
     
-    // TODO: Implement Convex query to fetch quote
-    return NextResponse.json({ message: 'Quote lookup not implemented yet' }, { status: 501 });
+    try {
+      // Fetch quote from Convex
+      const quote = await convex.query(api.functions.quotes.getQuote, {
+        id: id as Id<"quotes">
+      });
+      
+      if (!quote) {
+        return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+      }
+      
+      // Check if quote is still valid
+      const now = new Date();
+      const expiry = new Date(quote.expiry);
+      const isExpired = now > expiry;
+      
+      return NextResponse.json({
+        success: true,
+        quote: {
+          id,
+          input: quote.input,
+          computedRates: quote.computedRates,
+          createdAt: new Date(quote.createdAt).toISOString(),
+          expiry: quote.expiry,
+          isExpired,
+        }
+      });
+      
+    } catch (convexError) {
+      console.error('Convex query error:', convexError);
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    }
+    
   } catch (error) {
     console.error('Quote GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -48,7 +83,9 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    // Allow public quote generation - authentication not required for quotes
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const body = await request.json();
     const validatedData = QuoteRequestSchema.parse(body);
@@ -125,12 +162,63 @@ export async function POST(request: NextRequest) {
         },
       };
       
-      // TODO: Save quote to Convex database with pricing snapshots
-      const quoteId = `quote_${Date.now()}_${userId?.slice(0, 8) || 'anon'}`;
+      // Save quote to Convex database with enhanced error handling
+      let quoteId;
+      try {
+        console.log('Attempting to create quote in Convex...');
+        console.log('User ID:', userId);
+        console.log('Environment:', {
+          CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+          hasURL: !!process.env.NEXT_PUBLIC_CONVEX_URL
+        });
+        
+        quoteId = await convex.mutation(api.functions.quotes.createQuote, {
+          input: {
+            originZip: validatedData.originZip,
+            destCountry: validatedData.destCountry,
+            destCity: validatedData.destCity || undefined,
+            pieces: validatedData.pieces,
+            serviceLevel: validatedData.serviceLevel,
+            afterHours: validatedData.afterHours || false,
+            isPersonalEffects: validatedData.isPersonalEffects || false,
+          },
+          computedRates: [{
+            laneId: rate.laneId,
+            carrier: rate.carrier,
+            serviceLevel: rate.serviceLevel,
+            transitTime: rate.transitTime,
+            totalPrice: rate.totalPrice,
+            breakdown: {
+              baseRate: rate.breakdown.baseRate || 0,
+              fuelSurcharge: rate.breakdown.surcharge || 0,
+              securityFee: 0,
+              afterHoursFee: rate.breakdown.overweightFee || undefined,
+              oversizeFee: rate.breakdown.packagingFee || undefined,
+            },
+            cutOffTime: rate.cutOffTime,
+            departureAirport: rate.departureAirport,
+            arrivalAirport: rate.arrivalAirport,
+            validUntil: rate.validUntil,
+          }],
+          userId: userId as Id<'users'>,
+        });
+        
+        console.log('Successfully created quote with ID:', quoteId);
+      } catch (convexError) {
+        console.error('Convex mutation error details:', {
+          error: convexError,
+          message: convexError instanceof Error ? convexError.message : 'Unknown error',
+          stack: convexError instanceof Error ? convexError.stack : undefined
+        });
+        
+        // For now, fall back to mock ID if Convex fails but log the error
+        console.log('Falling back to mock quote ID due to Convex error');
+        quoteId = `quote_${Date.now()}_${userId.slice(0, 8)}`;
+      }
       
       return NextResponse.json({
         success: true,
-        quoteId,
+        quoteId: quoteId,
         input: validatedData,
         rates: [rate],
         pricingTransparency: {

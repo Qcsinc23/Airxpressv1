@@ -107,26 +107,33 @@ export const getBookingsByStatus = query({
   },
 });
 
-// Get all bookings for ops dashboard
-export const getOpsBookings = query({
-  handler: async (ctx) => {
-    const bookings = await ctx.db.query("bookings").collect();
+// Get bookings by user
+export const getBookingsByUser = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("bookings").withIndex("byUser", q => q.eq("userId", args.userId)).collect();
+  },
+});
+
+// Get booking by tracking number (searching all bookings)
+export const getBookingByTrackingNumber = query({
+  args: {
+    trackingNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Since tracking numbers are generated from booking IDs, we need to search for the booking
+    // Format: AX-TRK-{LAST_6_CHARS_OF_ID}
+    const trackingId = args.trackingNumber.replace('AX-TRK-', '').toLowerCase();
     
-    // Add computed fields for ops dashboard
-    return bookings.map(booking => ({
-      ...booking,
-      progress: {
-        progressPercentage: Math.min(100, Math.max(0, 
-          booking.status === 'NEW' ? 10 :
-          booking.status === 'NEEDS_DOCS' ? 25 :
-          booking.status === 'READY_TO_TENDER' ? 50 :
-          booking.status === 'TENDERED' ? 70 :
-          booking.status === 'IN_TRANSIT' ? 85 :
-          booking.status === 'ARRIVED' ? 95 : 100
-        )),
-        missingDocs: booking.documents && booking.documents.length === 0 ? 
-          ['Commercial Invoice', 'Packing List'] : []
-      }
-    }));
+    // Get all bookings and find one that matches the tracking pattern
+    const allBookings = await ctx.db.query("bookings").collect();
+    
+    const matchedBooking = allBookings.find(booking =>
+      booking._id.slice(-6).toLowerCase() === trackingId
+    );
+    
+    return matchedBooking;
   },
 });

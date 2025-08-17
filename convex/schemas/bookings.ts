@@ -41,5 +41,7 @@ export default defineSchema({
     }),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("byStatus", ["status"]),
+  })
+    .index("byStatus", ["status"])
+    .index("byUser", ["userId"]),
 });

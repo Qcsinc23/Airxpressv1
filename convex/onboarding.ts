@@ -1,6 +1,7 @@
 // convex/onboarding.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 export const upsertChecklist = mutation({
   args: {
@@ -43,7 +44,7 @@ export const initializeBookingChecklist = mutation({
     userId: v.id("users"),
     bookingId: v.string(),
   },
-  handler: async (ctx, { userId, bookingId }) => {
+  handler: async (ctx, { userId, bookingId }): Promise<{ checklistIds: any[], count: number }> => {
     const defaultChecklist = [
       { key: "upload-id-front", label: "Upload ID (Front)", done: false },
       { key: "upload-id-back", label: "Upload ID (Back)", done: false },
@@ -53,9 +54,9 @@ export const initializeBookingChecklist = mutation({
       { key: "confirm-shipment", label: "Confirm shipment details", done: false },
     ];
 
-    const checklistIds = [];
+    const checklistIds: any[] = [];
     for (const item of defaultChecklist) {
-      const checklistId = await ctx.runMutation("onboarding:upsertChecklist" as any, {
+      const checklistId: any = await ctx.runMutation(api.onboarding.upsertChecklist, {
         userId,
         bookingId,
         key: item.key,
@@ -83,7 +84,7 @@ export const saveAcknowledgement = mutation({
     const ackId = await ctx.db.insert("acknowledgements", args);
     
     // Mark checklist item as done
-    await ctx.runMutation("onboarding:upsertChecklist" as any, {
+    await ctx.runMutation(api.onboarding.upsertChecklist, {
       userId: args.userId,
       bookingId: args.bookingId,
       key: "acknowledge-disclaimer",
@@ -123,7 +124,7 @@ export const saveShippingInvoice = mutation({
     }
 
     // Mark checklist item as done
-    await ctx.runMutation("onboarding:upsertChecklist" as any, {
+    await ctx.runMutation(api.onboarding.upsertChecklist, {
       userId: invoice.userId,
       bookingId: invoice.bookingId,
       key: "complete-invoice",

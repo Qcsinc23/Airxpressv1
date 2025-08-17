@@ -1,6 +1,11 @@
 // app/api/user/quotes/route.ts
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET() {
   try {
@@ -10,40 +15,40 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // TODO: Implement Convex query to fetch user quotes
-    // const quotes = await getUserQuotes(userId);
-    
-    // Mock data for now
-    const mockQuotes = [
-      {
-        id: 'quote-1',
-        input: {
-          originZip: '07001',
-          destCountry: 'Guyana',
-          pieces: [{ type: 'box', weight: 10 }],
-          serviceLevel: 'EXPRESS',
-        },
-        computedRates: [
-          {
-            laneId: 'cal-JFK-GEO',
-            carrier: 'Caribbean Airlines',
-            totalPrice: 150.00,
-          },
-        ],
-        createdAt: '2024-08-09T10:00:00Z',
-        expiry: '2024-08-10T10:00:00Z',
-      },
-    ];
+    try {
+      // Fetch user quotes from Convex
+      const quotes = await convex.query(api.functions.quotes.getQuotesByUser, {
+        userId: userId as Id<"users">
+      });
 
-    return NextResponse.json({
-      success: true,
-      quotes: mockQuotes,
-    });
+      // Transform quotes to match expected API format
+      const formattedQuotes = quotes.map(quote => ({
+        id: quote._id,
+        input: quote.input,
+        computedRates: quote.computedRates,
+        createdAt: new Date(quote.createdAt).toISOString(),
+        expiry: quote.expiry,
+        isExpired: new Date() > new Date(quote.expiry),
+      }));
+
+      return NextResponse.json({
+        success: true,
+        quotes: formattedQuotes,
+      });
+
+    } catch (convexError) {
+      console.error('Convex query error:', convexError);
+      // Return empty array if query fails but user is authenticated
+      return NextResponse.json({
+        success: true,
+        quotes: [],
+      });
+    }
 
   } catch (error) {
     console.error('User quotes API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

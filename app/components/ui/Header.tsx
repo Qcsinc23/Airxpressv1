@@ -4,10 +4,12 @@
 import Link from 'next/link';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { useState } from 'react';
+import { useCartSummary } from '../../lib/hooks/useCart';
 
 export default function Header() {
   const { isSignedIn, user, isLoaded } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartSummary } = useCartSummary();
 
   return (
     <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg sticky top-0 z-50">
@@ -27,25 +29,47 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="/quote" 
+            <Link
+              href="/quote"
               className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
             >
               Get Quote
             </Link>
-            <Link 
-              href="/tracking" 
+            <Link
+              href="/tracking"
               className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
             >
               Track Shipment
             </Link>
+            <Link
+              href="/store"
+              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
+            >
+              Store
+            </Link>
             {isSignedIn && (
-              <Link 
-                href="/dashboard" 
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/store/cart"
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform flex items-center relative"
+                >
+                  <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 3H3m0 0v2M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.1" />
+                  </svg>
+                  Cart
+                  {cartSummary.itemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                      {cartSummary.itemCount > 9 ? '9+' : cartSummary.itemCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
+                >
+                  Dashboard
+                </Link>
+              </>
             )}
           </nav>
 
@@ -127,28 +151,52 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white/90 backdrop-blur-lg border-t border-gray-200 py-4 animate-in slide-in-from-top duration-200">
             <nav className="flex flex-col space-y-3">
-              <Link 
-                href="/quote" 
+              <Link
+                href="/quote"
                 className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Get Quote
               </Link>
-              <Link 
-                href="/tracking" 
+              <Link
+                href="/tracking"
                 className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Track Shipment
               </Link>
+              <Link
+                href="/store"
+                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Store
+              </Link>
               {isSignedIn && (
-                <Link 
-                  href="/dashboard" 
-                  className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/store/cart"
+                    className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200 flex items-center relative"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 3H3m0 0v2M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.1" />
+                    </svg>
+                    Cart
+                    {cartSummary.itemCount > 0 && (
+                      <span className="ml-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                        {cartSummary.itemCount > 9 ? '9+' : cartSummary.itemCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                </>
               )}
               
               {/* Mobile Ship Now button */}
