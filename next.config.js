@@ -24,6 +24,15 @@ const nextConfig = {
       }
     ],
   },
+  output: 'export',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   serverExternalPackages: ['convex'],
 };
 

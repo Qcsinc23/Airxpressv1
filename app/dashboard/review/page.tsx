@@ -1,6 +1,8 @@
 // app/dashboard/review/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
@@ -48,7 +50,7 @@ export default function ReviewPage() {
       total: 3,
       missingDocs: []
     },
-    documents: []
+    documents: [] as Array<{_id: string, filename: string, type: string, size: number, status: string}>
   } : null;
 
   // Default to first booking if none selected

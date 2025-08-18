@@ -19,20 +19,24 @@ const ProductInput = z.object({
   dimensionsIn: z
     .object({ length: z.number().positive(), width: z.number().positive(), height: z.number().positive() })
     .optional(),
-  attributes: z.record(z.string()).default({}),
+  attributes: z.record(z.string(), z.string()).default({}),
   availability: z.enum(["in_stock", "sold_out"]).default("in_stock"),
 });
 
 export async function POST(req: NextRequest) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
   const parsed = ProductInput.parse(body);
 
-  const id = await client.mutation(api.functions.utils.insertProduct, {
-    ...parsed,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+  const id = await client.mutation(api.functions.store.upsertProduct, {
+    doc: {
+      ...parsed,
+      price: { amount: parsed.price, currency: parsed.currency },
+      source: "internal",
+      sourceId: parsed.sourceId || `internal_${Date.now()}`,
+      availability: "in_stock"
+    }
   });
 
   return NextResponse.json({ success: true, id });
@@ -40,7 +44,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const list = await client.query(api.functions.utils.listProducts, {});
+    const list = await client.query(api.functions.store.getProducts, {});
     return NextResponse.json({ success: true, data: list });
   } catch (convexError) {
     console.error('Convex query error:', convexError);

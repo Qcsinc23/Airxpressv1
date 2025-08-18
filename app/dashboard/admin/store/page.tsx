@@ -1,6 +1,7 @@
 // app/dashboard/admin/store/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
 import Header from '../../../components/ui/Header';
 import { usePermissions } from '../../../lib/auth/usePermissions';

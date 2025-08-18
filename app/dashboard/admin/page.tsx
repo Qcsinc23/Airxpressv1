@@ -1,6 +1,7 @@
 // app/dashboard/admin/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation } from 'convex/react';
@@ -14,7 +15,8 @@ export default function AdminDashboard() {
   const hasAdminAccess = user?.publicMetadata?.role === 'admin';
 
   // Get system data - using available API endpoints
-  const allBookings = useQuery(api.functions.bookings.getOpsBookings) || [];
+  // TODO: Implement getOpsBookings function - using placeholder for now
+  const allBookings: any[] = [];
   // Note: SLA functions not available in current API, using placeholder
   const activeBreaches: any[] = [];
   

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const body = JSON.stringify(payload);
 
     // Create new Svix instance with webhook secret
-    const wh = new Webhook(WEBHOOK_SECRET);
+    const wh = new Webhook(WEBHOOK_SECRET!);
 
     let evt: ClerkWebhookEvent;
 

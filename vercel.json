@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "CONVEX_DEPLOYMENT": "@convex-deployment"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_CONVEX_URL": "@next-public-convex-url"
+    }
+  }
+}

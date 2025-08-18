@@ -175,7 +175,7 @@ export async function normalizeOffer(raw: unknown): Promise<NormalizedDealProduc
     url: offer.Url,
     asin: firstItem.Asin,
     condition: firstItem.Attributes.find(attr => attr.Key === "Condition")?.Value,
-    attributes: firstItem.Attributes,
+    attributes: firstItem.Attributes.map((attr: any) => ({ key: attr.Key, value: attr.Value })),
     purchaseLimit: offer.PurchaseLimit,
     quantityLimit: offer.QuantityLimit,
     shippingMethods: offer.ShippingMethods,

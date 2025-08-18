@@ -179,7 +179,7 @@ export default function QuoteConfirmation({
                 {copied ? 'Quote ID copied to clipboard' : ''}
               </div>
               
-              {navigator.share && (
+              {typeof navigator !== 'undefined' && 'share' in navigator && (
                 <motion.button
                   onClick={shareQuote}
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-all"

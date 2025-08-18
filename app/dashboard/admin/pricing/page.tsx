@@ -2,7 +2,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePermissions, Permission } from '../../../lib/auth/rbac';
+
+export const dynamic = 'force-dynamic';
+import { usePermissions } from '../../../lib/auth/usePermissions';
+import { Permission } from '../../../lib/auth/rbac';
 
 interface PricingPolicy {
   id: string;

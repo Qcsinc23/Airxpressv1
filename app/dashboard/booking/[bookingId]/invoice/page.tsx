@@ -1,6 +1,8 @@
 // app/dashboard/booking/[bookingId]/invoice/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
@@ -8,12 +10,19 @@ import { api } from '../../../../../convex/_generated/api';
 import { Id } from '../../../../../convex/_generated/dataModel';
 
 interface ShippingInvoiceProps {
-  params: {
+  params: Promise<{
     bookingId: string;
-  };
+  }>;
 }
 
 export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
+  const [bookingId, setBookingId] = useState<string>('');
+
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setBookingId(resolvedParams.bookingId);
+    });
+  }, [params]);
   const { user } = useUser();
   const [formData, setFormData] = useState({
     shipFrom: {
@@ -157,7 +166,7 @@ export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
     try {
       const invoiceData = {
         ...formData,
-        bookingId: params.bookingId,
+        bookingId: bookingId,
         userId: user?.id as Id<"users">,
         signature: {
           ...formData.signature,
@@ -170,7 +179,7 @@ export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
       
       // Redirect to booking overview after a delay
       setTimeout(() => {
-        window.location.href = `/dashboard/booking/${params.bookingId}`;
+        window.location.href = `/dashboard/booking/${bookingId}`;
       }, 2000);
       
     } catch (error) {
@@ -213,7 +222,7 @@ export default function ShippingInvoicePage({ params }: ShippingInvoiceProps) {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Cargo Xpress NJ - Shipping Invoice
             </h1>
-            <p className="text-gray-600">Booking ID: {params.bookingId}</p>
+            <p className="text-gray-600">Booking ID: {bookingId}</p>
           </div>
         </div>
 

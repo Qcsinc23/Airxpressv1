@@ -28,14 +28,16 @@
     "convex": "^1.13.0",
     "framer-motion": "^12.23.12",
     "next": "^15.4.6",
-    "nodemailer": "^7.0.5",
+    "nodemailer": "^6.9.0",
     "react": "19.0.0",
     "react-datepicker": "^8.5.0",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.62.0",
     "react-use-cart": "^1.14.0",
     "react-use-debounce": "^0.0.3",
+    "server-only": "^0.0.1",
     "stripe": "^14.4.0",
+    "svix": "^1.73.0",
     "zod": "^4.0.16"
   },
   "devDependencies": {

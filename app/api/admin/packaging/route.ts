@@ -2,7 +2,8 @@
 // Admin API for managing packaging SKUs with cost/sell price calculations
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireRole, Role } from '../../../lib/auth/rbac';
+import { requireRole } from '../../../lib/auth/rbac-server';
+import { Role } from '../../../lib/auth/rbac';
 import { PricingEngine } from '../../../lib/pricing/engine';
 import type { PackagingSKU } from '../../../lib/pricing/types';
 import { z } from 'zod';

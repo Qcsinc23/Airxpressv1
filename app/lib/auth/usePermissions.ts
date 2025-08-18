@@ -1,6 +1,7 @@
 // app/lib/auth/usePermissions.ts
 'use client';
 
+import React from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -26,7 +27,7 @@ export function usePermissions() {
 
     if (convexUser) {
       // Use Convex user data if available
-      role = convexUser.role;
+      role = convexUser.role as Role;
       permissions = rolePermissions[role] || rolePermissions[Role.CUSTOMER];
     } else if (clerkUser.publicMetadata?.role) {
       // Fallback to Clerk metadata
@@ -94,7 +95,7 @@ export function WithPermission({
 }) {
   const { hasPermission } = usePermissions();
   
-  return hasPermission(permission) ? <>{children}</> : <>{fallback}</>;
+  return hasPermission(permission) ? children : fallback;
 }
 
 // Component wrapper for role-based rendering
@@ -111,5 +112,5 @@ export function WithRole({
   
   const hasAccess = Array.isArray(role) ? hasAnyRole(role) : hasRole(role);
   
-  return hasAccess ? <>{children}</> : <>{fallback}</>;
+  return hasAccess ? children : fallback;
 }

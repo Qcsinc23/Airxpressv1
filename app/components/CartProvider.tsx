@@ -10,7 +10,6 @@ export default function CartProvider({ children }: CartProviderProps) {
   return (
     <ReactUseCartProvider 
       id="airxpress-store"
-      defaultCurrency="USD"
     >
       {children}
     </ReactUseCartProvider>

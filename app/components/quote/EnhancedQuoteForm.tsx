@@ -68,7 +68,7 @@ export default function EnhancedQuoteForm({
   const completionPercentage = getCompletionPercentage();
 
   const handleSubmit = form.handleSubmit((data) => {
-    const rateInput = convertToRateInput(data);
+    const rateInput = convertToRateInput(data as unknown as QuoteRequest);
     onSubmit(rateInput);
   });
 
@@ -159,7 +159,7 @@ export default function EnhancedQuoteForm({
               label="Pickup ZIP Code"
               name="originZip"
               error={getFieldError('originZip')}
-              warning={getFieldWarning('originZip', originZip)}
+              warning={getFieldWarning('originZip', originZip) || undefined}
               required
               icon={
                 <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">

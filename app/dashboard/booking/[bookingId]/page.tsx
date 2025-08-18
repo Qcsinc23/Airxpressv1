@@ -1,25 +1,35 @@
 // app/dashboard/booking/[bookingId]/page.tsx
 'use client';
 
-import { useState } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 interface BookingDetailProps {
-  params: {
+  params: Promise<{
     bookingId: string;
-  };
+  }>;
 }
 
 export default function BookingDetailPage({ params }: BookingDetailProps) {
   const { user } = useUser();
+  const [bookingId, setBookingId] = useState<string>('');
+  
+  // Resolve params
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setBookingId(resolvedParams.bookingId);
+    });
+  }, [params]);
   
   // Get booking data using available function
   const bookingData = useQuery(
     api.functions.bookings.getBooking,
-    { id: params.bookingId as Id<"bookings"> }
+    bookingId ? { id: bookingId as Id<"bookings"> } : "skip"
   );
 
   // TODO: Implement review state functionality when onboarding functions are available
@@ -66,7 +76,7 @@ export default function BookingDetailPage({ params }: BookingDetailProps) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking Details</h1>
-          <p className="text-gray-600">Booking ID: {params.bookingId}</p>
+          <p className="text-gray-600">Booking ID: {bookingId}</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
@@ -149,7 +159,7 @@ export default function BookingDetailPage({ params }: BookingDetailProps) {
                     {!item.done && (
                       <a
                         href={
-                          item.key === 'complete-invoice' ? `/dashboard/booking/${params.bookingId}/invoice` :
+                          item.key === 'complete-invoice' ? `/dashboard/booking/${bookingId}/invoice` :
                           item.key.includes('upload') ? '/dashboard/review' :
                           '/dashboard/review'
                         }
@@ -207,7 +217,7 @@ export default function BookingDetailPage({ params }: BookingDetailProps) {
                 </a>
                 
                 <a
-                  href={`/dashboard/booking/${params.bookingId}/invoice`}
+                  href={`/dashboard/booking/${bookingId}/invoice`}
                   className="w-full flex items-center p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
                 >
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">

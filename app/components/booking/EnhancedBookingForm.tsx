@@ -48,8 +48,8 @@ export default function EnhancedBookingForm({
       formData[field as keyof PickupDetails]?.toString().trim()
     );
     
-    const hasScheduledTime = formData.scheduledTime && new Date(formData.scheduledTime) > new Date();
-    setIsFormValid(allFieldsFilled && hasScheduledTime && Object.keys(errors).length === 0);
+    const hasScheduledTime = Boolean(formData.scheduledTime && new Date(formData.scheduledTime) > new Date());
+    setIsFormValid(Boolean(allFieldsFilled && hasScheduledTime && Object.keys(errors).length === 0));
   }, [formData, errors]);
 
   const handleInputChange = (field: keyof PickupDetails, value: string) => {

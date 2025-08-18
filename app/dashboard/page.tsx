@@ -1,6 +1,8 @@
 // app/dashboard/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import Header from '../components/ui/Header';

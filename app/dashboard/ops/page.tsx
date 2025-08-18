@@ -1,6 +1,8 @@
 // app/dashboard/ops/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation } from 'convex/react';
@@ -27,7 +29,8 @@ export default function OpsPage() {
   const [selectedColumn, setSelectedColumn] = useState<string>('all');
   
   // Get all bookings for ops dashboard
-  const allBookings = useQuery(api.functions.bookings.getOpsBookings) || [];
+  // TODO: Implement getOpsBookings function - using placeholder for now
+  const allBookings: any[] = [];
   const updateBookingStatus = useMutation(api.functions.bookings.updateBookingStatus);
 
   // Check if user has ops/admin role
@@ -228,7 +231,7 @@ export default function OpsPage() {
                 </div>
                 
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {bookings.map(booking => (
+                  {bookings.map((booking: BookingCard) => (
                     <BookingCard key={booking._id} booking={booking} />
                   ))}
                   

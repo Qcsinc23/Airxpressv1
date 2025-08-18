@@ -60,8 +60,8 @@ export const QuoteRequestSchema = z.object({
   serviceLevel: z.enum(['STANDARD', 'EXPRESS', 'NFO'], { 
     message: 'Service level is required' 
   }),
-  afterHours: z.boolean().optional().default(false),
-  isPersonalEffects: z.boolean().optional().default(false),
+  afterHours: z.boolean().optional(),
+  isPersonalEffects: z.boolean().optional(),
 });
 
 // Pickup details validation
