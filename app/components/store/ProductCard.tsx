@@ -8,7 +8,7 @@ interface Product {
   id: string;
   title: string;
   description: string;
-  price: number; // Price in cents
+  price: number; // Price as dollars (e.g., 79.99)
   currency: string;
   image?: string;
   category?: string;
@@ -28,7 +28,7 @@ export default function ProductCard({ product, onAddToCart, isAddingToCart = fal
     style: 'currency',
     currency: product.currency,
     minimumFractionDigits: 2,
-  }).format(product.price / 100);
+  }).format(product.price);
 
   // Get category color - using same gradient patterns as destinations
   const getCategoryColor = (category?: string) => {

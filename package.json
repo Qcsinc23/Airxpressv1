@@ -33,6 +33,7 @@
     "react-datepicker": "^8.5.0",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.62.0",
+    "react-use-cart": "^1.14.0",
     "react-use-debounce": "^0.0.3",
     "stripe": "^14.4.0",
     "zod": "^4.0.16"

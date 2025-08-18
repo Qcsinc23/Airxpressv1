@@ -1,228 +1,394 @@
-// app/store/page.tsx
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import Header from '../components/ui/Header';
-import ProductCard from '../components/store/ProductCard';
-import { useUser } from '@clerk/nextjs';
+"use client";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCart } from "react-use-cart";
+import StoreSidebar from "../components/StoreSidebar";
+import QuickView from "../components/QuickView";
 
 interface Product {
-  id: string;
+  sourceId: string;
   title: string;
+  fullTitle?: string;
+  subtitle?: string;
   description: string;
+  photos: Array<{ url: string; caption?: string; width?: number; height?: number }>;
   price: number;
+  listPrice?: number;
   currency: string;
-  image?: string;
-  category?: string;
-  inStock: boolean;
-  weight?: number;
+  availability: string;
+  source: string;
+  categories: string[];
+  site: string;
+  url: string;
+  condition?: string;
+  purchaseLimit?: number;
+  isWootOff?: boolean;
+  dealInfo?: {
+    discount?: number;
+    discountPercent?: number;
+    savings?: number;
+  };
 }
 
 export default function StorePage() {
-  const { user } = useUser();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedFeed, setSelectedFeed] = useState(searchParams.get("feed") || "All");
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const { addItem, items } = useCart();
 
-  // Fetch products on component mount
+  const feeds = ["All", "Electronics", "Computers", "Home", "Sports", "Tools", "Clearance"];
+
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const feedFromUrl = searchParams.get("feed");
+    if (feedFromUrl && feedFromUrl !== selectedFeed) {
+      setSelectedFeed(feedFromUrl);
+    }
+  }, [searchParams]);
 
-  const fetchProducts = async () => {
+  useEffect(() => {
+    loadCategories();
+    loadProducts();
+    loadRecommendations();
+  }, [selectedFeed, selectedCategory]);
+
+  async function loadCategories() {
     try {
-      setLoading(true);
-      const response = await fetch('/api/store/products?inStockOnly=true');
-      const data = await response.json();
-      
-      if (data.success) {
-        setProducts(data.products);
-      } else {
-        setError('Failed to load products');
+      const response = await fetch("/api/deals/woot/categories");
+      const result = await response.json();
+      if (result.success) {
+        setCategories(result.data);
       }
     } catch (err) {
-      setError('Failed to load products');
-      console.error('Error fetching products:', err);
+      console.error("Failed to load categories:", err);
+    }
+  }
+
+  async function loadProducts() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        feed: selectedFeed,
+        limit: "200",
+        ...(selectedCategory && { category: selectedCategory })
+      });
+
+      const response = await fetch(`/api/deals/woot?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setProducts(result.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load products:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleAddToCart = async (productId: string) => {
-    if (!user) {
-      // Redirect to sign in if not authenticated
-      window.location.href = '/sign-in';
-      return;
-    }
-
+  async function loadRecommendations() {
     try {
-      setAddingToCart(productId);
-      const response = await fetch('/api/store/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: 1,
-        }),
-      });
-
-      const data = await response.json();
+      // Load different category recommendations based on cart items
+      const cartCategories = items.flatMap((item: any) => item.categories || []);
+      const uniqueCategories = [...new Set(cartCategories)];
       
-      if (data.success) {
-        // Show success feedback (could add toast notification here)
-        console.log('Item added to cart successfully');
+      if (uniqueCategories.length > 0) {
+        // Get recommendations from different feeds
+        const feeds = ["Electronics", "Home", "Tools"];
+        const recommendedProducts: Product[] = [];
+        
+        for (const feed of feeds) {
+          try {
+            const response = await fetch(`/api/deals/woot?feed=${feed}&limit=3`);
+            const result = await response.json();
+            if (result.success && result.data) {
+              recommendedProducts.push(...result.data.slice(0, 3));
+            }
+          } catch (err) {
+            console.error(`Failed to load ${feed} recommendations:`, err);
+          }
+        }
+        
+        setRecommendations(recommendedProducts.slice(0, 9));
       } else {
-        console.error('Failed to add to cart:', data.error);
+        // Default recommendations if cart is empty
+        const response = await fetch("/api/deals/woot?feed=Electronics&limit=3");
+        const result = await response.json();
+        if (result.success) {
+          setRecommendations(result.data || []);
+        }
       }
     } catch (err) {
-      console.error('Error adding to cart:', err);
-    } finally {
-      setAddingToCart(null);
+      console.error("Failed to load recommendations:", err);
     }
-  };
+  }
+
+  const filteredProducts = products.filter(p => 
+    p.title.toLowerCase().includes(filter.toLowerCase()) ||
+    p.description.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  function addToCart(productId: string) {
+    const product = products.find(p => p.sourceId === productId) || 
+                  recommendations.find(p => p.sourceId === productId);
+    if (!product) return;
+
+    try {
+      addItem({
+        id: product.sourceId,
+        price: product.price,
+        title: product.title,
+        image: product.photos[0]?.url,
+        currency: product.currency,
+        availability: product.availability,
+        site: product.site,
+        categories: product.categories,
+        listPrice: product.listPrice,
+        dealInfo: product.dealInfo,
+      });
+      alert("Added to cart!");
+      loadRecommendations(); // Refresh recommendations based on new cart
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
+      alert("Failed to add to cart");
+    }
+  }
+
+  function handleCategoryChange(category: string) {
+    setSelectedCategory(category);
+    setProducts([]);
+  }
+
+  function openQuickView(product: Product) {
+    setQuickViewProduct(product);
+    setIsQuickViewOpen(true);
+  }
+
+  function closeQuickView() {
+    setIsQuickViewOpen(false);
+    setQuickViewProduct(null);
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <StoreSidebar />
+        <div className="flex-1 py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <h1 className="text-3xl font-bold mb-6">Store - {selectedFeed} Deals</h1>
+            <div className="text-center">Loading products...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <Header />
+    <div className="min-h-screen bg-gray-50 flex">
+      <StoreSidebar />
+      <div className="flex-1 py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-6">Store - {selectedFeed} Deals</h1>
+          
+          <div className="mb-6 flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="flex-1 min-w-64 px-4 py-2 border rounded-lg"
+            />
 
-      {/* Content Container - exact same structure as homepage */}
-      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        {/* Background Elements - identical to homepage */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-32 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-        </div>
-
-        <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Page Header - same styling as homepage sections */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                AirXpress Store
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Shop our curated selection of products with fast shipping to the Caribbean. 
-              All items can be shipped using our express air service.
-            </p>
+            <select
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="px-4 py-2 border rounded-lg"
+            >
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 shadow-lg">
-                <svg className="animate-spin w-8 h-8 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-              <p className="text-gray-600">Loading products...</p>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-full mb-4 shadow-lg">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <button
-                onClick={fetchProducts}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 transform shadow-lg hover:shadow-xl"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {/* Products Grid - EXACT same structure as destinations */}
-          {!loading && !error && (
-            <>
-              {products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {products.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                      isAddingToCart={addingToCart === product.id}
-                    />
-                  ))}
-                </div>
-              ) : (
-                // Empty state
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full mb-6 shadow-lg">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
-                    No Products Available
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    We're working on adding products to our store. Check back soon!
-                  </p>
-                </div>
-              )}
-
-              {/* Call to Action Section - same as homepage CTA */}
-              {products.length > 0 && (
-                <div className="mt-24 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-12 text-center text-white shadow-2xl relative overflow-hidden">
-                  {/* Background Pattern - identical to homepage */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white rounded-full"></div>
-                    <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-white rounded-full"></div>
-                  </div>
-                  
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 3H3m0 0v2M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.1" />
-                      </svg>
+          {recommendations.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">
+                {items.length > 0 ? "Recommended for You" : "Featured Deals"}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendations.map((p) => (
+                  <div key={`rec-${p.sourceId}`} className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-sm border border-blue-200 p-4 hover:shadow-md transition-shadow">
+                    <div className="relative cursor-pointer" onClick={() => {
+                      sessionStorage.setItem(`product_${p.sourceId}`, JSON.stringify(p));
+                      window.location.href = `/product/${p.sourceId}`;
+                    }}>
+                      <img src={p.photos?.[0]?.url} alt={p.title} className="w-full h-32 object-cover rounded-xl" />
+                      {p.dealInfo?.discountPercent && (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          -{p.dealInfo.discountPercent}%
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full">
+                        {p.site}
+                      </div>
                     </div>
-                    
-                    <h2 className="text-4xl font-bold mb-4">
-                      Ready to Shop?
-                    </h2>
-                    <p className="text-xl mb-10 opacity-90 max-w-2xl mx-auto">
-                      Add items to your cart and we'll ship them to the Caribbean with our express air service.
-                    </p>
-                    {user ? (
-                      <a
-                        href="/store/cart"
-                        className="inline-flex items-center bg-white hover:bg-gray-100 text-gray-900 px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transform transition-all duration-200 hover:scale-105"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 3H3m0 0v2M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.1" />
-                        </svg>
-                        View Cart
-                      </a>
-                    ) : (
-                      <a
-                        href="/sign-in"
-                        className="inline-flex items-center bg-white hover:bg-gray-100 text-gray-900 px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transform transition-all duration-200 hover:scale-105"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        Sign In to Shop
-                      </a>
-                    )}
+                    <div className="mt-2">
+                      <h3 className="font-medium text-sm overflow-hidden cursor-pointer hover:text-blue-600 transition-colors" 
+                          style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}
+                          onClick={() => {
+                            sessionStorage.setItem(`product_${p.sourceId}`, JSON.stringify(p));
+                            window.location.href = `/product/${p.sourceId}`;
+                          }}>
+                        {p.fullTitle || p.title}
+                      </h3>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="font-bold text-blue-600">${p.price.toFixed(2)}</span>
+                        <div className="flex gap-1">
+                          <button 
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full transition-colors"
+                            onClick={() => openQuickView(p)}
+                          >
+                            View
+                          </button>
+                          <button 
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full transition-colors"
+                            onClick={() => addToCart(p.sourceId)}
+                            disabled={p.availability !== 'in_stock'}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mb-4 text-sm text-gray-600">
+            Showing {filteredProducts.length} products
+            {selectedCategory && ` in ${selectedCategory}`}
+            {selectedFeed !== "All" && ` from ${selectedFeed}`}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((p) => (
+              <div key={p.sourceId} className="bg-white rounded-2xl shadow-sm border p-4 hover:shadow-md transition-shadow">
+                <div className="relative cursor-pointer" onClick={() => {
+                  // Store product data in sessionStorage for the detail page
+                  sessionStorage.setItem(`product_${p.sourceId}`, JSON.stringify(p));
+                  window.location.href = `/product/${p.sourceId}`;
+                }}>
+                  <img src={p.photos?.[0]?.url} alt={p.title} className="w-full h-48 object-cover rounded-xl" />
+                  {p.dealInfo?.discountPercent && (
+                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      -{p.dealInfo.discountPercent}%
+                    </div>
+                  )}
+                  {p.isWootOff && (
+                    <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      WOOT-OFF
+                    </div>
+                  )}
+                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                    {p.site}
                   </div>
                 </div>
-              )}
-            </>
+                <div className="mt-3">
+                  <h3 
+                    className="font-semibold text-sm overflow-hidden cursor-pointer hover:text-blue-600 transition-colors" 
+                    style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}
+                    onClick={() => {
+                      sessionStorage.setItem(`product_${p.sourceId}`, JSON.stringify(p));
+                      window.location.href = `/product/${p.sourceId}`;
+                    }}
+                  >
+                    {p.fullTitle || p.title}
+                  </h3>
+                  {p.subtitle && (
+                    <p className="text-xs text-blue-600 mt-1">{p.subtitle}</p>
+                  )}
+                  {p.condition && (
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                      {p.condition}
+                    </span>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1 overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                    {p.description}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {p.categories.slice(0, 2).map(cat => (
+                      <span key={cat} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                        {cat.split('/').pop()}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg text-blue-600">${p.price.toFixed(2)}</span>
+                      {p.listPrice && p.listPrice > p.price && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400 line-through">${p.listPrice.toFixed(2)}</span>
+                          <span className="text-xs text-green-600 font-medium">
+                            Save ${p.dealInfo?.savings?.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className={`text-xs px-2 py-1 rounded-full ${p.availability === 'in_stock' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {p.availability === 'in_stock' ? 'In Stock' : 'Sold Out'}
+                      </span>
+                      {p.purchaseLimit && (
+                        <span className="text-xs text-orange-600">
+                          Limit: {p.purchaseLimit}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button 
+                      className="flex-1 bg-gray-100 text-gray-800 px-3 py-2 rounded-xl font-medium hover:bg-gray-200 transition-colors text-sm"
+                      onClick={() => openQuickView(p)}
+                    >
+                      Quick View
+                    </button>
+                    <button 
+                      className={`flex-1 px-3 py-2 rounded-xl text-white font-medium transition-colors text-sm ${p.availability === 'in_stock' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+                      onClick={() => addToCart(p.sourceId)}
+                      disabled={p.availability !== 'in_stock'}
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {filteredProducts.length === 0 && !loading && (
+            <div className="text-center text-gray-500 mt-8">
+              {filter ? 'No products match your search.' : 'No products available.'}
+            </div>
           )}
-        </main>
+        </div>
       </div>
+
+      <QuickView 
+        product={quickViewProduct}
+        isOpen={isQuickViewOpen}
+        onClose={closeQuickView}
+      />
     </div>
   );
 }
