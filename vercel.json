@@ -11,5 +11,6 @@
     "env": {
       "NEXT_PUBLIC_CONVEX_URL": "@next-public-convex-url"
     }
-  }
+  },
+  "installCommand": "npm install --legacy-peer-deps"
 }
