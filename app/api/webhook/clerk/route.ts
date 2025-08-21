@@ -8,12 +8,8 @@ import { Id } from '../../../../convex/_generated/dataModel';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-// Webhook secret from Clerk Dashboard
+// Webhook secret from Clerk Dashboard - will be validated at runtime
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
-
-if (!WEBHOOK_SECRET) {
-  throw new Error('Please add CLERK_WEBHOOK_SECRET to your .env.local file');
-}
 
 type ClerkWebhookEvent = {
   type: 'user.created' | 'user.updated' | 'user.deleted';
@@ -35,6 +31,11 @@ type ClerkWebhookEvent = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate webhook secret at runtime
+    if (!WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+    }
+
     // Get headers
     const headerPayload = await headers();
     const svix_id = headerPayload.get('svix-id');

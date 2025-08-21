@@ -24,7 +24,6 @@ const nextConfig = {
       }
     ],
   },
-  output: 'export',
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   eslint: {

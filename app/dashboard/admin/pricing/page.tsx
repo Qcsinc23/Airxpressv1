@@ -51,7 +51,12 @@ interface PreviewResult {
 }
 
 export default function AdminPricingPage() {
-  const { hasPermission, loading: authLoading } = usePermissions();
+  // Check if we're in a browser environment to avoid build-time issues with Convex hooks
+  const isBrowser = typeof window !== 'undefined';
+  const { hasPermission, loading: authLoading } = isBrowser ? usePermissions() : { 
+    hasPermission: () => false, 
+    loading: true 
+  };
   const [policy, setPolicy] = useState<PricingPolicy | null>(null);
   const [preview, setPreview] = useState<PreviewResult[]>([]);
   const [loading, setLoading] = useState(true);

@@ -25,13 +25,15 @@ interface BookingCard {
 }
 
 export default function OpsPage() {
+  // Check if we're in a browser environment to avoid build-time issues with Convex hooks
+  const isBrowser = typeof window !== 'undefined';
   const { user } = useUser();
   const [selectedColumn, setSelectedColumn] = useState<string>('all');
   
   // Get all bookings for ops dashboard
   // TODO: Implement getOpsBookings function - using placeholder for now
   const allBookings: any[] = [];
-  const updateBookingStatus = useMutation(api.functions.bookings.updateBookingStatus);
+  const updateBookingStatus = isBrowser ? useMutation(api.functions.bookings.updateBookingStatus) : () => Promise.resolve();
 
   // Check if user has ops/admin role
   const hasOpsAccess = user?.publicMetadata?.role === 'ops' || user?.publicMetadata?.role === 'admin';

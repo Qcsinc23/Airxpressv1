@@ -20,7 +20,13 @@ interface Product {
 }
 
 export default function AdminStorePage() {
-  const { hasRole, isAdmin, loading: authLoading } = usePermissions();
+  // Check if we're in a browser environment to avoid build-time issues with Convex hooks
+  const isBrowser = typeof window !== 'undefined';
+  const { hasRole, isAdmin, loading: authLoading } = isBrowser ? usePermissions() : { 
+    hasRole: () => false, 
+    isAdmin: false, 
+    loading: true 
+  };
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
