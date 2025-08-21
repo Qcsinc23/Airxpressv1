@@ -1,7 +1,6 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "react-use-cart";
 import StoreSidebar from "../components/StoreSidebar";
@@ -32,7 +31,7 @@ interface Product {
   };
 }
 
-export default function StorePage() {
+function StoreContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -392,5 +391,23 @@ export default function StorePage() {
         onClose={closeQuickView}
       />
     </div>
+  );
+}
+
+export default function StorePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex">
+        <StoreSidebar />
+        <div className="flex-1 py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <h1 className="text-3xl font-bold mb-6">Store - Loading...</h1>
+            <div className="text-center">Loading store...</div>
+          </div>
+        </div>
+      </div>
+    }>
+      <StoreContent />
+    </Suspense>
   );
 }
