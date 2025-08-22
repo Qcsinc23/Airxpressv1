@@ -7,9 +7,31 @@ import { useState } from 'react';
 import { useCartSummary } from '../../lib/hooks/useCart';
 
 export default function Header() {
-  const { isSignedIn, user, isLoaded } = useUser();
+  // Handle case where Clerk provider might not be available (during build)
+  let isSignedIn = false;
+  let user = null;
+  let isLoaded = false;
+  
+  try {
+    const userState = useUser();
+    isSignedIn = userState.isSignedIn || false;
+    user = userState.user;
+    isLoaded = userState.isLoaded || false;
+  } catch (error) {
+    // During build time, Clerk hooks might not be available
+    console.warn('Clerk hooks not available during build');
+  }
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cartSummary } = useCartSummary();
+  
+  // Handle cart summary safely
+  let cartSummary = { itemCount: 0 };
+  try {
+    cartSummary = useCartSummary().cartSummary;
+  } catch (error) {
+    // Cart hook might not be available during build
+    console.warn('Cart hooks not available during build');
+  }
 
   return (
     <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg sticky top-0 z-50">
@@ -93,7 +115,7 @@ export default function Header() {
                   <div className="flex items-center space-x-3">
                     {/* Welcome text for larger screens */}
                     <span className="hidden lg:block text-sm text-gray-600">
-                      Welcome, <span className="font-semibold text-gray-900">{user.firstName || user.emailAddresses[0]?.emailAddress}</span>
+                      Welcome, <span className="font-semibold text-gray-900">{user?.firstName || user?.emailAddresses?.[0]?.emailAddress || 'User'}</span>
                     </span>
                     
                     {/* User Button with custom styling */}
