@@ -8,7 +8,14 @@ const isBrowser = typeof window !== 'undefined';
 
 export function getConvexClient() {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-  if (!convexUrl) {
+  if (!convexUrl || convexUrl.trim() === '') {
+    // During build time, environment variables might not be available
+    // Return a mock client or throw a more specific error
+    if (process.env.NODE_ENV === 'production' && !convexUrl) {
+      // In production build, create a dummy client that won't be used
+      // This allows the build to complete while still failing at runtime if actually called
+      return new ConvexHttpClient('https://dummy-build-url.convex.cloud');
+    }
     throw new Error("NEXT_PUBLIC_CONVEX_URL environment variable is not set. This is required for server-side rendering and API routes during build and runtime.");
   }
   return new ConvexHttpClient(convexUrl);

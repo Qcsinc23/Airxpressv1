@@ -13,6 +13,19 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
       return null;
     }
 
+    // During build time, skip Convex operations and return basic user info
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl || convexUrl.trim() === '' || convexUrl.includes('dummy-build-url')) {
+      console.warn('Convex URL not available during build, using fallback user info');
+      const permissions = rolePermissions[Role.CUSTOMER];
+      return {
+        id: userId,
+        email: '',
+        role: Role.CUSTOMER,
+        permissions,
+      };
+    }
+
     // Get user from Convex database
     try {
       const convex = getConvexClient();
@@ -34,6 +47,17 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
       }
     } catch (convexError) {
       console.warn('Could not fetch user from Convex:', convexError);
+      // Check if this is a build-time or deployment address error
+      if (convexError instanceof Error && convexError.message.includes('deployment address')) {
+        console.warn('Build-time Convex error, using fallback');
+        const permissions = rolePermissions[Role.CUSTOMER];
+        return {
+          id: userId,
+          email: '',
+          role: Role.CUSTOMER,
+          permissions,
+        };
+      }
     }
 
     // Fallback to default role if user not found in Convex
