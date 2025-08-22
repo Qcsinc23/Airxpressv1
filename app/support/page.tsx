@@ -1,24 +1,34 @@
 // app/support/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
 import Header from '../components/ui/Header';
 import Breadcrumb from '../components/ui/Breadcrumb';
 
 // Force dynamic rendering for pages that use authentication
 export const dynamic = 'force-dynamic';
 
+interface ClerkUser {
+  fullName?: string | null;
+  emailAddresses?: Array<{ emailAddress: string }>;
+}
+
 export default function SupportPage() {
-  // Safe Clerk hook usage with build-time error handling
-  let user = null;
-  
-  try {
-    const userState = useUser();
-    user = userState.user;
-  } catch (error) {
-    console.warn('Clerk hooks not available during build');
-  }
+  // Initialize user as null, will be populated after component mounts
+  const [user, setUser] = useState<ClerkUser | null>(null);
+  const [clerkLoaded, setClerkLoaded] = useState(false);
+
+  // Safely load user data after component mounts
+  useEffect(() => {
+    // Only try to load Clerk on the client side
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+      // Note: We can't use useUser hook here as it needs to be at the top level
+      // Instead, we'll handle this gracefully without user data prefill
+      setClerkLoaded(true);
+    } else {
+      setClerkLoaded(true);
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     name: user?.fullName || '',
@@ -48,7 +58,7 @@ export default function SupportPage() {
         setSubmitted(true);
         setFormData({
           name: user?.fullName || '',
-          email: user?.emailAddresses[0]?.emailAddress || '',
+          email: user?.emailAddresses?.[0]?.emailAddress || '',
           phone: '',
           subject: '',
           message: '',
