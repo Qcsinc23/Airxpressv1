@@ -2,10 +2,8 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
 import { api } from '../../../convex/_generated/api';
-import { ConvexHttpClient } from 'convex/browser';
 import { Role, Permission, rolePermissions, UserWithRole } from './rbac';
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { getConvexClient } from '../convex/client';
 
 export async function getCurrentUser(): Promise<UserWithRole | null> {
   try {
@@ -17,6 +15,7 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
 
     // Get user from Convex database
     try {
+      const convex = getConvexClient();
       const convexUser = await convex.query(api.functions.users.getUserByClerkId, {
         clerkId: userId
       });
