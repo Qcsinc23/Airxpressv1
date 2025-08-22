@@ -3,11 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PricingEngine } from '../../lib/pricing/engine';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
-
-import { getConvexClient } from '../../../lib/convex/client';
+import { getConvexClient } from '../../lib/convex/client';
 const QuoteRequestSchema = z.object({
   originZip: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
   destCountry: z.string().min(1, 'Destination country is required'),
@@ -169,7 +167,7 @@ export async function POST(request: NextRequest) {
           hasURL: !!process.env.NEXT_PUBLIC_CONVEX_URL
         });
         
-        quoteId = await convex.mutation(api.functions.quotes.createQuote, {
+        quoteId = await getConvexClient().mutation(api.functions.quotes.createQuote, {
           input: {
             originZip: validatedData.originZip,
             destCountry: validatedData.destCountry,

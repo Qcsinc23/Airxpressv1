@@ -3,11 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import Stripe from 'stripe';
-import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 
-import { getConvexClient } from '../../../lib/convex/client';
+import { getConvexClient } from '../../lib/convex/client';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
@@ -156,7 +155,7 @@ export async function GET(request: NextRequest) {
       // Also fetch the related quote for complete information
       let quote = null;
       try {
-        quote = await convex.query(api.functions.quotes.getQuote, {
+        quote = await getConvexClient().query(api.functions.quotes.getQuote, {
           id: booking.quoteId
         });
       } catch (quoteError) {
