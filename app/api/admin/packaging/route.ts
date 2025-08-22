@@ -7,6 +7,7 @@ import { Role } from '../../../lib/auth/rbac';
 import { PricingEngine } from '../../../lib/pricing/engine';
 import type { PackagingSKU } from '../../../lib/pricing/types';
 import { z } from 'zod';
+import { getConvexClient } from '../../../lib/convex/client';
 
 const PackagingSKUSchema = z.object({
   code: z.string().min(1, 'SKU code is required'),
