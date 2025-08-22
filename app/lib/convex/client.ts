@@ -1,17 +1,24 @@
-// app/lib/convex/client.ts
-// Client-side Convex integration for AirXpress
+import { ConvexHttpClient } from "convex/browser";
+import { ConvexReactClient } from "convex/react";
 
-'use client';
+let convexInstance: ConvexReactClient | null = null;
 
-import { ConvexReactClient } from 'convex/react';
-
-if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
-  throw new Error('Missing NEXT_PUBLIC_CONVEX_URL in your environment');
+export function getConvexClient() {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  if (!convexUrl) {
+    throw new Error("NEXT_PUBLIC_CONVEX_URL environment variable is not set");
+  }
+  return new ConvexHttpClient(convexUrl);
 }
 
-// Create the Convex client
-export const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
-
-// Re-export for convenience
-export { api } from '../../../convex/_generated/api';
-export type { DataModel } from '../../../convex/_generated/dataModel';
+// Lazy-loaded client instance for use in client components
+export function getConvex() {
+  if (!convexInstance) {
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl) {
+      throw new Error("NEXT_PUBLIC_CONVEX_URL environment variable is not set");
+    }
+    convexInstance = new ConvexReactClient(convexUrl);
+  }
+  return convexInstance;
+}
