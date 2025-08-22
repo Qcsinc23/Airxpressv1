@@ -5,6 +5,9 @@ import React from 'react';
 import Header from '../../components/ui/Header';
 import Cart from '../../components/store/Cart';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 export default function CartPage() {
   return (
     <div className="min-h-screen">

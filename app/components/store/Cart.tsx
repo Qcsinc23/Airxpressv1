@@ -34,7 +34,19 @@ interface Cart {
 }
 
 export default function Cart() {
-  const { user } = useUser();
+  // Safe Clerk hook usage with build-time error handling
+  let user = null;
+  let isLoaded = false;
+  
+  try {
+    const userState = useUser();
+    user = userState.user;
+    isLoaded = userState.isLoaded;
+  } catch (error) {
+    console.warn('Clerk hooks not available during build');
+    isLoaded = false;
+  }
+
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
