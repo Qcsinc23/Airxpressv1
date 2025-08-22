@@ -9,7 +9,7 @@ import { getConvex } from '../lib/convex/client';
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <ConvexProvider client={getConvex()}>
+      <ConvexProvider client={getConvex()!}>
         {children}
       </ConvexProvider>
     </ClerkProvider>
