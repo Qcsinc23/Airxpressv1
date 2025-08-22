@@ -5,8 +5,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -17,7 +16,7 @@ export async function GET() {
 
     try {
       // Fetch user bookings from Convex
-      const bookings = await convex.query(api.functions.bookings.getBookingsByUser, {
+      const bookings = await getConvexClient().query(api.functions.bookings.getBookingsByUser, {
         userId: userId as Id<"users">
       });
 

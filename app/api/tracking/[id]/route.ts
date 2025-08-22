@@ -4,8 +4,7 @@ import { z } from 'zod';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 // GET - Public tracking lookup
 export async function GET(
   request: NextRequest,
@@ -20,7 +19,7 @@ export async function GET(
     
     try {
       // Try to find booking by tracking number in Convex
-      const booking = await convex.query(api.functions.bookings.getBookingByTrackingNumber, {
+      const booking = await getConvexClient().query(api.functions.bookings.getBookingByTrackingNumber, {
         trackingNumber: trackingId
       });
       

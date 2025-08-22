@@ -7,11 +7,10 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 
+import { getConvexClient } from '../../../lib/convex/client';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const BookingRequestSchema = z.object({
   quoteId: z.string().min(1, 'Quote ID is required'),
@@ -73,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (paymentIntent.status === 'succeeded') {
       try {
         // Create booking in Convex with checklist initialization and auto-assignment
-        const bookingId = await convex.mutation(api.functions.bookings.createBooking, {
+        const bookingId = await getConvexClient().mutation(api.functions.bookings.createBooking, {
           quoteId: validatedData.quoteId as Id<"quotes">,
           userId: userId as Id<"users">,
           pickupDetails: validatedData.pickupDetails,
@@ -141,7 +140,7 @@ export async function GET(request: NextRequest) {
     
     try {
       // Fetch booking from Convex
-      const booking = await convex.query(api.functions.bookings.getBooking, {
+      const booking = await getConvexClient().query(api.functions.bookings.getBooking, {
         id: id as Id<"bookings">
       });
       

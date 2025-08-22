@@ -1,11 +1,9 @@
 import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 
-const client = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 const ProductInput = z.object({
   source: z.literal("internal").default("internal"),
   sourceId: z.string().default(""),
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = ProductInput.parse(body);
 
-  const id = await client.mutation(api.functions.store.upsertProduct, {
+  const id = await getConvexClient().mutation(api.functions.store.upsertProduct, {
     doc: {
       ...parsed,
       price: { amount: parsed.price, currency: parsed.currency },
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const list = await client.query(api.functions.store.getProducts, {});
+    const list = await getConvexClient().query(api.functions.store.getProducts, {});
     return NextResponse.json({ success: true, data: list });
   } catch (convexError) {
     console.error('Convex query error:', convexError);

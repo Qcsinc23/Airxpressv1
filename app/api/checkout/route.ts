@@ -7,8 +7,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 const CheckoutRequestSchema = z.object({
   quoteId: z.string().min(1, 'Quote ID is required'),
 });

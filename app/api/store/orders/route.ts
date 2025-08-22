@@ -6,8 +6,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 // Order creation schema
 const CreateOrderSchema = z.object({
   paymentIntentId: z.string().min(1, 'Payment intent ID is required'),
@@ -33,7 +32,7 @@ export async function GET() {
 
     try {
       // TODO: Implement getUserOrders function in store.ts
-      // const orders = await convex.query(api.functions.store.getUserOrders, {
+      // const orders = await getConvexClient().query(api.functions.store.getUserOrders, {
       //   userId: userId as Id<"users">
       // });
       const orders: any[] = [];
@@ -90,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // TODO: Implement createOrder function in store.ts
-      // const orderId = await convex.mutation(api.functions.store.createOrder, {
+      // const orderId = await getConvexClient().mutation(api.functions.store.createOrder, {
       //   userId: userId as Id<"users">,
       //   paymentIntentId: validatedData.paymentIntentId,
       //   shippingAddress: validatedData.shippingAddress,

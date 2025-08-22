@@ -6,8 +6,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
@@ -43,7 +42,7 @@ export async function POST(request: NextRequest) {
         const { quoteId, userId } = session.metadata!;
 
         // Fetch the quote to get pickup details
-        const quote = await convex.query(api.functions.quotes.getQuote, { id: quoteId as Id<'quotes'> });
+        const quote = await getConvexClient().query(api.functions.quotes.getQuote, { id: quoteId as Id<'quotes'> });
 
         if (!quote) {
           console.error('Quote not found for quoteId:', quoteId);

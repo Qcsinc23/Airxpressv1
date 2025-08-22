@@ -12,11 +12,9 @@ import PackagingSelector from '../components/quote/PackagingSelector';
 import ModernBookingForm, { PickupDetails } from '../components/booking/ModernBookingForm';
 import { Rate, RateInput } from '../types/shipping';
 import Breadcrumb, { QuoteProcessBreadcrumbs } from '../components/ui/Breadcrumb';
-import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { getConvex } from '../lib/convex/client';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 type FlowStep = 'quote' | 'confirmation' | 'results' | 'booking' | 'payment';
@@ -124,10 +122,13 @@ export default function EnhancedQuotePage() {
       
       if (!isMockId) {
         try {
-          await convex.mutation(api.functions.quotes.addPickupDetailsToQuote, {
-            quoteId: quoteId as Id<'quotes'>,
-            pickupDetails: details,
-          });
+          const convexClient = getConvex();
+          if (convexClient) {
+            await convexClient.mutation(api.functions.quotes.addPickupDetailsToQuote, {
+              quoteId: quoteId as Id<'quotes'>,
+              pickupDetails: details,
+            });
+          }
         } catch (convexError) {
           console.error('Convex pickup details error:', convexError);
         }

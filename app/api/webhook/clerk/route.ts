@@ -6,8 +6,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+import { getConvexClient } from '../../../lib/convex/client';
 // Webhook secret from Clerk Dashboard - will be validated at runtime
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
