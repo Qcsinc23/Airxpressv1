@@ -31,8 +31,23 @@ interface Cart {
   itemCount: number;
 }
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 export default function CheckoutPage() {
-  const { user, isLoaded } = useUser();
+  // Safe Clerk hook usage with build-time error handling
+  let user = null;
+  let isLoaded = false;
+  
+  try {
+    const userState = useUser();
+    user = userState.user;
+    isLoaded = userState.isLoaded;
+  } catch (error) {
+    console.warn('Clerk hooks not available during build');
+    isLoaded = false;
+  }
+
   const router = useRouter();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
