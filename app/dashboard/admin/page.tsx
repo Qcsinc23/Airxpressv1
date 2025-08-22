@@ -2,14 +2,37 @@
 'use client';
 
 export const dynamic = 'force-dynamic';
-import { useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 
+interface ClerkUser {
+  firstName?: string;
+  publicMetadata?: { role?: string };
+}
+
 export default function AdminDashboard() {
-  const { user } = useUser();
+  // Initialize user as null, will be populated after component mounts
+  const [user, setUser] = useState<ClerkUser | null>(null);
+  const [clerkLoaded, setClerkLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'sla' | 'users' | 'system'>('overview');
+
+  // Safely load user data after component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+      try {
+        const { useUser } = require('@clerk/nextjs');
+        const userHook = useUser();
+        setUser(userHook.user);
+        setClerkLoaded(true);
+      } catch (error) {
+        console.warn('Clerk hooks not available:', error);
+        setClerkLoaded(true);
+      }
+    } else {
+      setClerkLoaded(true);
+    }
+  }, []);
 
   // Check if user has admin access
   const hasAdminAccess = user?.publicMetadata?.role === 'admin';

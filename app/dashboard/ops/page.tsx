@@ -3,11 +3,15 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
+
+interface ClerkUser {
+  fullName?: string;
+  publicMetadata?: { role?: string };
+}
 
 interface BookingCard {
   _id: Id<"bookings">;
@@ -27,8 +31,27 @@ interface BookingCard {
 export default function OpsPage() {
   // Check if we're in a browser environment to avoid build-time issues with Convex hooks
   const isBrowser = typeof window !== 'undefined';
-  const { user } = useUser();
+  // Initialize user as null, will be populated after component mounts
+  const [user, setUser] = useState<ClerkUser | null>(null);
+  const [clerkLoaded, setClerkLoaded] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>('all');
+
+  // Safely load user data after component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+      try {
+        const { useUser } = require('@clerk/nextjs');
+        const userHook = useUser();
+        setUser(userHook.user);
+        setClerkLoaded(true);
+      } catch (error) {
+        console.warn('Clerk hooks not available:', error);
+        setClerkLoaded(true);
+      }
+    } else {
+      setClerkLoaded(true);
+    }
+  }, []);
   
   // Get all bookings for ops dashboard
   // TODO: Implement getOpsBookings function - using placeholder for now
