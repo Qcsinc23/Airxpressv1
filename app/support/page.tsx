@@ -6,11 +6,23 @@ import { useUser } from '@clerk/nextjs';
 import Header from '../components/ui/Header';
 import Breadcrumb from '../components/ui/Breadcrumb';
 
+// Force dynamic rendering for pages that use authentication
+export const dynamic = 'force-dynamic';
+
 export default function SupportPage() {
-  const { user } = useUser();
+  // Safe Clerk hook usage with build-time error handling
+  let user = null;
+  
+  try {
+    const userState = useUser();
+    user = userState.user;
+  } catch (error) {
+    console.warn('Clerk hooks not available during build');
+  }
+
   const [formData, setFormData] = useState({
     name: user?.fullName || '',
-    email: user?.emailAddresses[0]?.emailAddress || '',
+    email: user?.emailAddresses?.[0]?.emailAddress || '',
     phone: '',
     subject: '',
     message: '',

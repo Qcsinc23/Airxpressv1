@@ -26,7 +26,19 @@ interface DashboardStats {
 }
 
 export default function UserDashboard() {
-  const { user, isLoaded } = useUser();
+  // Safe Clerk hook usage with build-time error handling
+  let user = null;
+  let isLoaded = false;
+  
+  try {
+    const userState = useUser();
+    user = userState.user;
+    isLoaded = userState.isLoaded;
+  } catch (error) {
+    console.warn('Clerk hooks not available during build');
+    isLoaded = false;
+  }
+
   const [bookings, setBookings] = useState<BookingSummary[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
