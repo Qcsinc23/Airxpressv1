@@ -130,6 +130,7 @@ async function handleUserCreated(userData: ClerkWebhookEvent['data']) {
     role = 'admin';
   }
 
+  const convex = getConvexClient();
   await convex.mutation(api.functions.users.createUser, {
     clerkId: userData.id,
     email: primaryEmail,
@@ -164,6 +165,7 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
     role = userData.public_metadata.role as typeof role;
   }
 
+  const convex = getConvexClient();
   await convex.mutation(api.functions.users.updateUser, {
     clerkId: userData.id,
     email: primaryEmail,
@@ -175,6 +177,7 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
 }
 
 async function handleUserDeleted(userId: string) {
+  const convex = getConvexClient();
   await convex.mutation(api.functions.users.deleteUser, {
     clerkId: userId,
   });
